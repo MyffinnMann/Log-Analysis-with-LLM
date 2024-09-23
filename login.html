@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureLang Logs (SLL) - Login</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>SecureLang Logs (SLL)</h1>
+        <form id="loginForm">
+            <div>
+                <label for="username">Användarnamn:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div>
+                <label for="password">Lösenord:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Logga in</button>
+        </form>
+        <div id="errorMessage" style="color:red; display:none;">Felaktiga inloggningsuppgifter!</div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function (event) {
+            event.preventDefault(); // Förhindrar formuläret från att skicka om sidan
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                // Skicka inloggningsuppgifter till backend (servern)
+                const response = await fetch('http://127.0.0.1:5000/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }), // Skicka JSON
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    // Omdirigera användaren till chat-sidan om inloggningen lyckas
+                    window.location.href = './chat.html';
+                } else {
+                    // Visa felmeddelande om inloggningen misslyckas
+                    document.getElementById('errorMessage').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
