@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureLang Logs (SLL)</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="page-header">
+        <h2>SecureLang Logs (SLL)</h2>
+    </header>
+    
+    <div class="chat-container">
+        <!-- Chat window -->
+        <div class="chat-window">
+            <div class="chat-message bot">
+                <p>Hi, how can I assist you today?</p>
+            </div>
+            <div class="chat-message user">
+                <p>User questions.</p>
+            </div>
+        </div>
+
+        <!-- Message input area -->
+        <div class="chat-input">
+            <button id="attachment-btn">
+                📎
+            </button>
+            <input type="text" placeholder="Type your message..." id="message-input">
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        <p>&copy; 2024 SecureLang Logs (SLL)</p>
+    </footer>
+
+    <script>
+        const sendBtn = document.getElementById('send-btn');
+        const messageInput = document.getElementById('message-input');
+        const chatWindow = document.querySelector('.chat-window');
+
+        sendBtn.addEventListener('click', () => {
+            const userMessage = messageInput.value;
+            if (userMessage.trim()) {
+                // Add user message to chat
+                const userMsgDiv = document.createElement('div');
+                userMsgDiv.classList.add('chat-message', 'user');
+                userMsgDiv.innerHTML = `<p>${userMessage}</p>`;
+                chatWindow.appendChild(userMsgDiv);
+
+                // Clear input
+                messageInput.value = '';
+                // Scroll to the bottom of the chat window
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+        });
+
+        // Add logic for attachment button (you can add file handling here) JS
+        const attachmentBtn = document.getElementById('attachment-btn');
+        attachmentBtn.addEventListener('click', () => {
+            alert('Select a File To analyze');
+            
+        });
+    </script>
+</body>
+</html>
