@@ -21,6 +21,8 @@ from langchain_community.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain_huggingface import HuggingFaceEmbeddings
 
+import sql
+
 app = Flask(__name__)
 CORS(app)
 
@@ -127,8 +129,32 @@ def generate():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+# api = Flask(__name__)
+# CORS(api)  # Aktivera CORS för hela appen
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    print(f"Data mottagen från frontend: {data}")  # Debug
+
+    username = data.get('username')
+    password = data.get('password')
+
+    print(f"Kontrollerar användarnamn: {username} och lösenord: {password}")  # Debug
+    Bo_value = sql.check_login(username, password)
+    # Kontrollera om användarnamn och lösenord matchar
+    if Bo_value == True:
+        print("Inloggning lyckades!")  # Debug
+        return jsonify({"success": True}), 200
+    else:
+        print("Inloggning misslyckades!")  # Debug
+        return jsonify({"success": False}), 401
+
+
 if __name__ == '__main__':
     # directory to store the logfile
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
     app.run(host='0.0.0.0', port=5000)
+

@@ -30,6 +30,8 @@ def verify_pas(stored_pas, given_pas):      #VERFIERA LÖSENORDET SOM ÄR GIVET 
 
 #_______LOGIN  
 def check_login(username, pas):
+    Bo_value = False # inicialicera den med false för att om den inte hamnar i try: den försöker returnera den ändå i slutet av funktionen
+                    # och man för error att man använder en variable utan att declarera den först.
     db = connect()
     cursor = db.cursor()
     sql_query = """SELECT pasw FROM users
@@ -43,3 +45,35 @@ def check_login(username, pas):
         pass
 
     return Bo_value
+
+############################################
+# den här funktionen är för att lägga till en test användare
+# så man kan testa login sidan senare
+# den kan användas för att bygga sign up sidan kanske
+def insert_user(username, password):
+    db = connect()
+    cursor = db.cursor()
+
+    # hash lösenordet
+    hashed_password = hash_pas(password)
+
+    sql_query = "INSERT INTO users (Username, pasw) VALUES (%s, %s)"
+    values = (username, hashed_password)
+
+    try:
+        cursor.execute(sql_query, values)
+        db.commit() # commit ändring till db
+        print(f"User {username} inserted successfully.")
+    except mysql.connector.Error as error:
+        print("Error inserting user:", error)
+    finally:
+        cursor.close()
+        db.close()
+
+if __name__ == "__main__":
+    # lägga till en användare för att testa login sidan
+    test_username = "user2"
+    test_password = "password2"
+
+    insert_user(test_username, test_password)
+################################################

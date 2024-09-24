@@ -14,3 +14,5 @@ den skickar log skickar log filen med attachment knappen och visar lite analys a
 men när man frågar mer frågor genom send knappen då funkar den inte. 
 kanske persistent lagring av logfilen fixar den.
 ska kolla på den senare
+
+lagt till login route och sql.py filen från BAER branch
