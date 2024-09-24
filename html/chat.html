@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureLang Logs (SLL)</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="page-header">
+        <h2>SecureLang Logs (SLL)</h2>
+    </header>
+    
+    <div class="chat-container">
+        <!-- Chat window -->
+        <div class="chat-window">
+            <div class="chat-message bot">
+                <p>Hi, how can I assist you today?</p>
+            </div>
+            <div class="chat-message user">
+                <p>User questions.</p>
+            </div>
+        </div>
+
+        <!-- Message input area -->
+        <div class="chat-input">
+            <!-- file upload form -->
+            <form id="file-upload-form" enctype="multipart/form-data">
+                <input type="file" id="logfile" name="logfile" accept=".log">
+                <button id="attachment-btn" type="submit">
+                    📎
+                </button>
+            </form>
+
+            <input type="text" placeholder="Type your message..." id="message-input">
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        <p>&copy; 2024 SecureLang Logs (SLL)</p>
+    </footer>
+
+    <script>
+        const sendBtn = document.getElementById('send-btn');
+        const messageInput = document.getElementById('message-input');
+        const chatWindow = document.querySelector('.chat-window');
+        const fileUploadForm = document.getElementById('file-upload-form');
+
+        // send the log file to flask api
+        fileUploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(fileUploadForm);
+            const response = await fetch('http://localhost:5000/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                const botMsgDiv = document.createElement('div');
+                botMsgDiv.classList.add('chat-message', 'bot');
+                botMsgDiv.innerHTML = `<p>${result.response}</p>`;
+                chatWindow.appendChild(botMsgDiv);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            } else {
+                // alert(`Error: ${result.error}`);
+                const botMsgDiv = document.createElement('div');
+                botMsgDiv.classList.add('chat-message', 'bot');
+                botMsgDiv.innerHTML = `<p>${result.error}</p>`;
+                chatWindow.appendChild(botMsgDiv);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+        });
+
+        // send user question to flask api
+        sendBtn.addEventListener('click', async () => {
+            const userMessage = messageInput.value;
+            if (userMessage.trim()) {
+                // Add user message to chat
+                const userMsgDiv = document.createElement('div');
+                userMsgDiv.classList.add('chat-message', 'user');
+                userMsgDiv.innerHTML = `<p>${userMessage}</p>`;
+                chatWindow.appendChild(userMsgDiv);
+
+                // Send user message to flask API
+                const response = await fetch('http://localhost:5000/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userMessage })
+                });
+
+                const result = await response.json(); // reply from api
+
+                // add the reply to the chat window
+                if (response.ok) {
+                    // If status is 200
+                    const botMsgDiv = document.createElement('div');
+                    botMsgDiv.classList.add('chat-message', 'bot');
+                    botMsgDiv.innerHTML = `<p>${result.response}</p>`;
+                    chatWindow.appendChild(botMsgDiv);
+                } else if (response.status === 400) {
+                    // If status is 400 ("if vector_db is None:" section in api)
+                    const botMsgDiv = document.createElement('div');
+                    botMsgDiv.classList.add('chat-message', 'bot');
+                    botMsgDiv.innerHTML = `<p>Error: ${result.error}</p>`;
+                    chatWindow.appendChild(botMsgDiv);
+                } else if (response.status === 500) {
+                    // If status is 500 (Internal Server Error)
+                    const botMsgDiv = document.createElement('div');
+                    botMsgDiv.classList.add('chat-message', 'bot');
+                    botMsgDiv.innerHTML = `<p>Server error: ${result.error}</p>`;
+                    chatWindow.appendChild(botMsgDiv);
+                }
+
+                // Clear input
+                messageInput.value = '';
+                // Scroll to the bottom of the chat window
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+        });
+
+    </script>
+</body>
+</html>

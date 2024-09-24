@@ -1,0 +1,16 @@
+kör programmet i 3 olika terminaler
+
+terminal 1:
+ollama server # ollama lysnar här
+
+terminal 2:
+python3 -m http-server # samma directory as index.html. http servern lysnar i port 8000
+
+terminal 3:
+python3 appp.py # kolla terminal log för status eller error när den kör
+
+INFO:
+den skickar log skickar log filen med attachment knappen och visar lite analys av log datan.
+men när man frågar mer frågor genom send knappen då funkar den inte. 
+kanske persistent lagring av logfilen fixar den.
+ska kolla på den senare
