@@ -1,11 +1,14 @@
 {
     "cSpell.words": [
+        "batcha",
         "huggingface",
         "llms",
         "mpnet",
         "Ollama",
         "Proxifier",
         "qachain",
+        "torchaudio",
+        "torchvision",
         "vectorstores"
     ]
 }

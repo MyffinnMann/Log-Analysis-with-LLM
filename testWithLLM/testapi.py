@@ -13,6 +13,8 @@ ollama_instance = Ollama(base_url = "http://127.0.0.1:11434", model = "llama3.1"
 hf = HuggingFaceEmbeddings(show_progress = True, model_kwargs = {"device" : "cuda"})
 
 
+
+
 # log_file = Path(__file__).with_name("SSH.log") # 20mb
 # loader = TextLoader(log_file)
 
