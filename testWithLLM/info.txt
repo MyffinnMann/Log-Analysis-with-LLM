@@ -1,0 +1,11 @@
+den kör på cpu vi hade inget gpu på hosting om jag inte minns fel
+
+behöver installera en massa men de bör stå vilket när man försöker köra koden, behöver ha ollama och llama3.1 model lokalt på datorn.
+
+har försökt köra den med workers/batcha/parallellt men inte fått något att fungera bra.
+
+huggingface embedding är den bästa av de jag provat
+
+vector db chroma är för att ge llm "minne"
+
+installera för att gpu ska fungera för NVIDIA: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
