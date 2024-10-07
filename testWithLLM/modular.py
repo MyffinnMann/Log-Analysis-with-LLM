@@ -7,6 +7,7 @@ from langchain.chains import RetrievalQA
 from pathlib import Path
 from langchain_huggingface import HuggingFaceEmbeddings
 import torch
+import torch_directml
 
 def setup_ollama_model(complete_instruction,
                                         base_url="http://127.0.0.1:11434",
@@ -22,7 +23,7 @@ def setup_embeddings(use_nvidia=True):
     if use_nvidia:
         return HuggingFaceEmbeddings(show_progress=True, model_kwargs={"device": "cuda"})
     else:
-        return HuggingFaceEmbeddings(show_progress=True, model_kwargs={"device": torch.device()})
+        return HuggingFaceEmbeddings(show_progress=True, model_kwargs={"device": torch_directml.device()})
 
 
 def load_document(log_file_path):
