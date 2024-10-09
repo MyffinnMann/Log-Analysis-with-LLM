@@ -28,7 +28,7 @@ def verify_pas(stored_pas, given_pas):      #VERFIERA LÖSENORDET SOM ÄR GIVET 
     except:
         return False
 
-#_______LOGIN  
+#_______LOGIN
 def check_login(username, pas):
     db = connect()
     cursor = db.cursor()
