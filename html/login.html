@@ -6,9 +6,12 @@
     <title>SecureLang Logs (SLL) - Login</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
-<body>
-    <div class="container">
+<body id="login">
+    <header class="page-header">
         <h1>SecureLang Logs (SLL)</h1>
+    </header>
+
+    <main class="chat-container">
         <form id="loginForm">
             <div>
                 <label for="username">Användarnamn:</label>
@@ -18,10 +21,15 @@
                 <label for="password">Lösenord:</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit">Logga in</button>
+            <button type="submit" id="send-btn">Logga in</button>
         </form>
         <div id="errorMessage" style="color:red; display:none;">Felaktiga inloggningsuppgifter!</div>
-    </div>
+    </main>
+    
+    <footer class="page-footer">
+        <p>&copy; 2024 SecureLang Logs (SLL)</p>
+    </footer>
+    
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function (event) {

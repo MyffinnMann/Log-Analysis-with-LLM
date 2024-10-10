@@ -1,0 +1,31 @@
+/* styling for the nav part of the index page and the main part of the login page */
+body#index > nav.chat-container, body#login > main.chat-container {
+    padding: 20px;
+}
+
+/* styling for the login buttons */
+body#index > .chat-container > ul > li {
+    list-style: none;
+    text-align: center;
+    padding: 1.6em;
+}
+
+/* styling for the login buttons */
+body#index > nav.chat-container > ul > li > a {
+    /* change text styling for the button */
+    font-size: 1.6em;
+    text-decoration: none;
+    color: white;
+
+    /* change the buttons styling */
+    padding: 0.5em;
+    border-radius: 20px;
+    background-color: #333;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* change color when hovering with the mouse over the login buttons */
+body#index > nav.chat-container > ul > li > a:hover {
+    background-color: #222;
+}
