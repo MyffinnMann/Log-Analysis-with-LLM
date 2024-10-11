@@ -17,9 +17,6 @@
             <div class="chat-message bot">
                 <p>Hi, how can I assist you today?</p>
             </div>
-            <div class="chat-message user">
-                <p>User questions.</p>
-            </div>
         </div>
 
         <!-- Message input area -->
@@ -47,34 +44,31 @@
         const chatWindow = document.querySelector('.chat-window');
         const fileUploadForm = document.getElementById('file-upload-form');
 
-        // send the log file to flask api
+        // Send the log file to Flask API
         fileUploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const formData = new FormData(fileUploadForm);
-            const response = await fetch('http://localhost:5000/upload', {
+            const response = await fetch('http://localhost:5000/upload_log', {
                 method: 'POST',
                 body: formData
             });
 
             const result = await response.json();
+            const botMsgDiv = document.createElement('div');
+            botMsgDiv.classList.add('chat-message', 'bot');
+
             if (response.ok) {
-                const botMsgDiv = document.createElement('div');
-                botMsgDiv.classList.add('chat-message', 'bot');
-                botMsgDiv.innerHTML = `<p>${result.response}</p>`;
-                chatWindow.appendChild(botMsgDiv);
-                chatWindow.scrollTop = chatWindow.scrollHeight;
+                botMsgDiv.innerHTML = `<p>${result.message}</p>`; // Correct the key to access message
             } else {
-                // alert(`Error: ${result.error}`);
-                const botMsgDiv = document.createElement('div');
-                botMsgDiv.classList.add('chat-message', 'bot');
                 botMsgDiv.innerHTML = `<p>${result.error}</p>`;
-                chatWindow.appendChild(botMsgDiv);
-                chatWindow.scrollTop = chatWindow.scrollHeight;
             }
+
+            chatWindow.appendChild(botMsgDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
         });
 
-        // send user question to flask api
+        // Send user message to Flask API
         sendBtn.addEventListener('click', async () => {
             const userMessage = messageInput.value;
             if (userMessage.trim()) {
@@ -84,33 +78,25 @@
                 userMsgDiv.innerHTML = `<p>${userMessage}</p>`;
                 chatWindow.appendChild(userMsgDiv);
 
-                // Send user message to flask API
-                const response = await fetch('http://localhost:5000/generate', {
+                // Send user message to Flask API
+                const response = await fetch('http://localhost:5000/message', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userMessage })
+                    body: JSON.stringify({ message: userMessage })  // Skickar meddelandet i rätt format
                 });
 
-                const result = await response.json(); // reply from api
+                const result = await response.json(); // Reply from API
 
-                // add the reply to the chat window
+                // Add the reply to the chat window
                 if (response.ok) {
-                    // If status is 200
                     const botMsgDiv = document.createElement('div');
                     botMsgDiv.classList.add('chat-message', 'bot');
                     botMsgDiv.innerHTML = `<p>${result.response}</p>`;
                     chatWindow.appendChild(botMsgDiv);
-                } else if (response.status === 400) {
-                    // If status is 400 ("if vector_db is None:" section in api)
+                } else {
                     const botMsgDiv = document.createElement('div');
                     botMsgDiv.classList.add('chat-message', 'bot');
                     botMsgDiv.innerHTML = `<p>Error: ${result.error}</p>`;
-                    chatWindow.appendChild(botMsgDiv);
-                } else if (response.status === 500) {
-                    // If status is 500 (Internal Server Error)
-                    const botMsgDiv = document.createElement('div');
-                    botMsgDiv.classList.add('chat-message', 'bot');
-                    botMsgDiv.innerHTML = `<p>Server error: ${result.error}</p>`;
                     chatWindow.appendChild(botMsgDiv);
                 }
 
@@ -120,7 +106,6 @@
                 chatWindow.scrollTop = chatWindow.scrollHeight;
             }
         });
-
     </script>
 </body>
 </html>
