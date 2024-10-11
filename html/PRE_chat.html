@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureLang Logs (SLL)</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="page-header">
+        <h2>SecureLang Logs (SLL)</h2>
+    </header>
+
+    <div class="instructions">
+        <h3>Chat Instructions</h3>
+        <textarea id="chat-instructions" placeholder="Write your chat instructions here..."></textarea>
+    </div>
+
+    <div class="upload-container">
+        <input type="file" id="logfile" name="logfile" accept=".log" required>
+    </div>
+
+    <div class="start-conversation">
+        <button id="start-btn" disabled>Start Conversation</button>
+    </div>
+
+    <footer class="page-footer">
+        <p>&copy; 2024 SecureLang Logs (SLL)</p>
+    </footer>
+
+    <script>
+        const startBtn = document.getElementById('start-btn');
+        const chatInstructionsInput = document.getElementById('chat-instructions');
+        const logfileInput = document.getElementById('logfile');
+
+        // Enable Start Conversation button if a file is selected
+        logfileInput.addEventListener('change', () => {
+            startBtn.disabled = logfileInput.files.length === 0; // Enable if a file is selected
+        });
+
+        // Function to handle start conversation
+        startBtn.addEventListener('click', async () => {
+            if (logfileInput.files.length > 0) {
+                const formData = new FormData();
+                formData.append('logfile', logfileInput.files[0]);
+
+                // Upload the log file
+                const fileResponse = await fetch('http://localhost:5000/upload_log', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const fileResult = await fileResponse.json();
+
+                if (fileResponse.ok) {
+                    alert(fileResult.message); // Display success message for file upload
+                } else {
+                    alert(`File Upload Error: ${fileResult.error}`); // Display error message for file upload
+                    return; // Stop execution if file upload fails
+                }
+
+                // Send chat instructions if they exist
+                const instructions = chatInstructionsInput.value.trim();
+                if (instructions) {
+                    const instructionsResponse = await fetch('http://localhost:5000/start', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message:instructions })
+                    });
+
+                    const instructionsResult = await instructionsResponse.json();
+
+                    /*if (instructionsResponse.ok) {
+                        alert(instructionsResult.message); // Display success message for instructions
+                    } else {
+                        alert(`Instructions Send Error: ${instructionsResult.error}`); // Display error message for instructions
+                    }*/
+                }
+
+                // Redirect to chat page
+                window.location.href = 'chat.html'; // Redirect to chat page
+            } else {
+                alert('Please select a log file before starting the conversation.');
+            }
+        });
+    </script>
+</body>
+</html>
