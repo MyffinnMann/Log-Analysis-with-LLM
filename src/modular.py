@@ -1,6 +1,6 @@
 from langchain_community.llms import Ollama
 from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter  # Adjusted import path
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain.chains import RetrievalQA
@@ -8,22 +8,32 @@ from pathlib import Path
 from langchain_huggingface import HuggingFaceEmbeddings
 import torch
 import torch_directml
+from datetime import datetime
+
+def get_user_id(): # detta id kan vara token?
+    return "User_2"
 
 def setup_ollama_model(complete_instruction,
                                         base_url="http://127.0.0.1:11434",
                                         model="llama3.1",):
     """Set up the Ollama LLM model instance."""
 
-    llm = Ollama(base_url=base_url, model=model, template=complete_instruction)
+    llm = Ollama(base_url=base_url,
+                model=model,
+                template=complete_instruction)
     return llm
 
 
-def setup_embeddings(use_nvidia=True):
+def setup_embeddings(use_nvidia=True, use_cpu=False):
     """Set up embedding model; can toggle between HuggingFace and Ollama embeddings."""
-    if use_nvidia:
-        return HuggingFaceEmbeddings(show_progress=True, model_kwargs={"device": "cuda"})
-    else:
-        return HuggingFaceEmbeddings(show_progress=True, model_kwargs={"device": torch_directml.device()})
+    if use_nvidia and not use_cpu:
+        return HuggingFaceEmbeddings(show_progress=True,
+                                    model_kwargs={"device": "cuda"})
+    if not use_nvidia and not use_cpu:
+        return HuggingFaceEmbeddings(show_progress=True,
+                                    model_kwargs={"device": torch_directml.device()})
+    if use_cpu:
+        return HuggingFaceEmbeddings(show_progress=True)
 
 
 def load_document(log_file_path):
@@ -33,20 +43,63 @@ def load_document(log_file_path):
     return loader.load()
 
 
-def split_documents(data, chunk_size=1000, chunk_overlap=200):
+def split_documents(data, chunk_size=1000, chunk_overlap=200): # göra test med denna för optimering på dator vi ska använda vid demo?
     """Split the loaded documents into chunks."""
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size,
+                                                                            chunk_overlap=chunk_overlap)
     return text_splitter.split_documents(data)
 
 
-def setup_vector_db(chunks, embeddings, collection_name="local"):
+def setup_vector_db(chunks, embeddings, collection_name="local", persist_directory=None):
     """Create a vector database from document chunks and embeddings."""
-    return Chroma.from_documents(documents=chunks, embedding=embeddings, collection_name=collection_name)
+    return Chroma.from_documents(
+            documents=chunks,
+            embedding=embeddings,
+            collection_name=collection_name,
+            persist_directory=str(persist_directory)
+    )
 
 
 def setup_qa_chain(llm_instance, vector_db):
     """Set up the RetrievalQA chain using the LLM instance and vector database retriever."""
     return RetrievalQA.from_chain_type(llm_instance, retriever=vector_db.as_retriever())
+
+def persistent_storage(question, answer, user_id, embeddings, vector_db):
+    """Store relevant information on a user so that communication can be personalized"""
+    timestamp = datetime.utcnow().isoformat()
+
+    # create embedding so they can be stored
+    question_embedding = embeddings.embed_query(question)
+    answer_embedding = embeddings.embed_query(answer)
+
+    # Store question
+    vector_db.add_texts(
+        texts=[question],
+        embeddings=[question_embedding],
+        metadatas=[{"user_id": user_id, "interaction_type": "question", "timestamp": timestamp}]
+    )
+
+    # Store answer
+    vector_db.add_texts(
+        texts=[answer],
+        embeddings=[answer_embedding],
+        metadatas=[{"user_id": user_id, "interaction_type": "answer", "timestamp": timestamp}]
+    )
+
+    vector_db.persist()
+
+def load_vector_db(user_id, persist_directory_base="db", collection_name="local", embeddings=None):
+    """Load an existing user-specific persistent vector database."""
+    persist_directory = Path(persist_directory_base) / user_id
+    return Chroma(
+        embedding_function=embeddings,
+        persist_directory=str(persist_directory),
+        collection_name=collection_name
+    )
+
+def remove_user_data(vector_db):
+    """removes entire db"""
+    vector_db.reset()
 
 def main():
     # Configuration
@@ -57,8 +110,10 @@ def main():
 
     log_file_path = Path(__file__).with_name("Proxifier.log")  # path
     use_nvidia = True  # sätt till false för amd
+    use_cpu = False # sätt till True om inte har dedikerat GPU
     model_name = "llama3.1"
     base_url = "http://127.0.0.1:11434"
+    user_id = get_user_id()
 
 
     # Setup LLM, embeddings, and data
@@ -67,20 +122,36 @@ def main():
                                                                     complete_instruction=complete_instruction)
 
 
-    embeddings = setup_embeddings(use_nvidia=use_nvidia)
+    embeddings = setup_embeddings(use_nvidia=use_nvidia,
+                                                            use_cpu=use_cpu)
     data = load_document(log_file_path)
-
-
-    # Split document and create vector store
     chunks = split_documents(data)
-    vector_db = setup_vector_db(chunks, embeddings)
+
+    # load existing or create a new one
+    user_directory = Path("db") / user_id
+    if user_directory.exists():
+        vector_db = load_vector_db(user_id=user_id, embeddings=embeddings)
+    else:
+        vector_db = setup_vector_db(chunks, embeddings, persist_directory=user_directory)
 
     # Setup QA chain
     qachain = setup_qa_chain(ollama_instance, vector_db)
 
-    question = input("Ask a question\n")
-    response = qachain({"query": question})
-    print(f"Answer: {response['result']}")
+    # conversation loop
+    while True:
+        question = input("Ask a question (or type 'exit' to quit):\n")
+        if question.lower() == 'exit':
+            break
+
+        # get response
+        response = qachain({"query": question})
+
+        # get answer
+        answer = response['result']
+        print(f"Answer: {answer}")
+
+        # store interaction in Chroma DB
+        persistent_storage(question, answer, user_id, embeddings, vector_db)
 
 if __name__ == "__main__":
     main()
