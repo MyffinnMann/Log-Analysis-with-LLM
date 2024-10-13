@@ -66,7 +66,7 @@ def setup_qa_chain(llm_instance, vector_db):
 
 def persistent_storage(question, answer, user_id, embeddings, vector_db):
     """Store relevant information on a user so that communication can be personalized"""
-    timestamp = datetime.now(datetime.UTC)
+    timestamp = datetime.now()
 
     # create embedding so they can be stored
     question_embedding = embeddings.embed_query(question)
