@@ -111,7 +111,7 @@ def main():
     log_file_path = Path(__file__).with_name("Proxifier.log")  # path
     use_nvidia = True  # sätt till false för amd
     use_cpu = False # sätt till True om inte har dedikerat GPU
-    model_name = "llama3.1"
+    model_name = "llama3.2"
     base_url = "http://127.0.0.1:11434"
     user_id = get_user_id()
 
