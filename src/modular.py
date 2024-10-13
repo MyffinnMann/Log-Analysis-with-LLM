@@ -15,7 +15,7 @@ def get_user_id(): # detta id kan vara token?
 
 def setup_ollama_model(complete_instruction,
                                         base_url="http://127.0.0.1:11434",
-                                        model="llama3.1",):
+                                        model="llama3.2",):
     """Set up the Ollama LLM model instance."""
 
     llm = Ollama(base_url=base_url,
@@ -66,7 +66,7 @@ def setup_qa_chain(llm_instance, vector_db):
 
 def persistent_storage(question, answer, user_id, embeddings, vector_db):
     """Store relevant information on a user so that communication can be personalized"""
-    timestamp = datetime.utcnow().isoformat()
+    timestamp = datetime.now(datetime.UTC)
 
     # create embedding so they can be stored
     question_embedding = embeddings.embed_query(question)
