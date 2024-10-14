@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import sql
+import backend.src.sql as sql
 from src.modular import *
 
 

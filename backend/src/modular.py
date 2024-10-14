@@ -88,7 +88,7 @@ def persistent_storage(question, answer, user_id, embeddings, vector_db):
 
     vector_db.persist()
 
-def load_vector_db(user_id, persist_directory_base="db", collection_name="local", embeddings=None):
+def load_vector_db(user_id, persist_directory_base="backend/db", collection_name="local", embeddings=None):
     """Load an existing user-specific persistent vector database."""
     persist_directory = Path(persist_directory_base) / user_id
     return Chroma(
@@ -128,7 +128,7 @@ def main():
     chunks = split_documents(data)
 
     # load existing or create a new one
-    user_directory = Path("db") / user_id
+    user_directory = Path("backend/db") / user_id
     if user_directory.exists():
         vector_db = load_vector_db(user_id=user_id, embeddings=embeddings)
     else:
