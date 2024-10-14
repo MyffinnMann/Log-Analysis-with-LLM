@@ -9,3 +9,23 @@ huggingface embedding är den bästa av de jag provat
 vector db chroma är för att ge llm "minne"
 
 installera för att gpu ska fungera för NVIDIA: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+
+pip install langchain
+pip install langchain-community
+pip install torch
+pip install torch-directml
+pip install chromadb
+pip install huggingface-hub
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+Dependencies:
+langchain_community
+langchain
+torch
+torch_directml
+pathlib
+datetime
+langchain_huggingface.HuggingFaceEmbeddings
+Chroma
+Ollama with llama3.2
