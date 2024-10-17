@@ -1,13 +1,12 @@
 from langchain_community.llms import Ollama
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from pathlib import Path
 from langchain_huggingface import HuggingFaceEmbeddings
 import torch
-import torch_directml
+# import torch_directml
 from datetime import datetime
 
 def get_user_id(): # detta id kan vara token?
@@ -31,7 +30,7 @@ def setup_embeddings(use_nvidia=True, use_cpu=False):
                                     model_kwargs={"device": "cuda"})
     if not use_nvidia and not use_cpu:
         return HuggingFaceEmbeddings(show_progress=True,
-                                    model_kwargs={"device": torch_directml.device()})
+                                    model_kwargs={"device": "cpu"})
     if use_cpu:
         return HuggingFaceEmbeddings(show_progress=True)
 

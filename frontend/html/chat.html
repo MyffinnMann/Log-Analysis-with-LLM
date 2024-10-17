@@ -79,7 +79,7 @@
                 chatWindow.appendChild(userMsgDiv);
 
                 // Send user message to Flask API
-                const response = await fetch('http://localhost:5000/message', {
+                const response = await fetch('http://localhost:5000/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: userMessage })  // Skickar meddelandet i rätt format
