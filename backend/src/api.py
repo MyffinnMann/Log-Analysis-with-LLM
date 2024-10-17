@@ -101,6 +101,13 @@ def start():
 
     if user_message:
         print("START MESSAGE: ", user_message)      #FOR TESTING
+@api.route('/start', methods=['POST'])        #To get chat instruction PRE CHAT
+def start():
+    data = request.get_json()
+    user_message = data.get('message')
+
+    if user_message:
+        print("START MESSAGE: ", user_message)      #FOR TESTING
 
 
 
