@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import backend.src.sql as sql
-from src.modular import *
+import sql as sql
+from modular import *
 
+api = Flask(__name__)
+CORS(api)
 
 #________VARIABLER FÖR TEST O HÅRDKOD_________
 model_name = "llama3.1"
@@ -10,13 +12,9 @@ base_url = "http://127.0.0.1:11434"
 use_nvidia = True
 temple = "" #todo
 
-api = Flask(__name__)
-
-
 #____________LLM startup____________
-Ollama = setup_ollama_model(base_url=base_url, model=model_name)
-embedding = setup_embeddings()
-CORS(api)
+embedding = setup_embeddings(use_nvidia=True)
+
 
 @api.route('/login', methods=['POST'])
 def login():
