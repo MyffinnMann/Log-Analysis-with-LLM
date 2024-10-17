@@ -96,6 +96,13 @@ def chat(ollama_instance, vector_db ):
         return jsonify({"error": "No message provided"}), 400
 
 
+@api.route('/start', methods=['POST'])        #To get chat instruction PRE CHAT
+def start():
+    data = request.get_json()
+    user_message = data.get('message')
+
+    if user_message:
+        print("START MESSAGE: ", user_message)      #FOR TESTING
 
 
 
