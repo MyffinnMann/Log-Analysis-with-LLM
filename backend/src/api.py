@@ -3,50 +3,44 @@ from flask_cors import CORS
 import sql as sql
 from modular import *
 
+# flask application startup
 api = Flask(__name__)
 CORS(api)
 
-#________VARIABLER FÖR TEST O HÅRDKOD_________
-model_name = "llama3.1"
-base_url = "http://127.0.0.1:11434"
-use_nvidia = True
-temple = "" #todo
+# håll info för session
+user_sessions= {}
 
-#____________LLM startup____________
-embedding = setup_embeddings(use_nvidia=True)
-
-
+# login
 @api.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
+
     Bo_value = sql.check_login(username, password)
     if Bo_value:
-        return jsonify({"success": True}), 200
+        user_id = get_user_id() # TEMP VET INTE VAR DENNA SKA KOMMA FRÅN
+        user_directory = Path("backend/db") / user_id
+
+        user_sessions[user_id] = {
+            "user_directory": user_directory,
+            "vector_db": None,  # håller
+            "ollama_instance": None  # håller
+        }
+
+        return jsonify({"success": True, "user_id": user_id}), 200
     else:
         return jsonify({"success": False}), 401
 
-@api.route('/message', methods=['POST'])#få chat
-def chat():
-    data = request.get_json()
-    user_message = data.get('message')
+# pre chat
+@api.route('/setup', methods=['POST'])
+def setup_for_chat():
+    user_id = request.args.get('user_id')
+    chat_instruction = request.form.get('chat_instruction') # ska komma från web interface
 
-    if user_message:
-        # Skicka meddelandet till Ollama-instansen och få ett svar
-        chat_instruction = user_message
-        if chat_instruction == None:
-            chat_instruction = ""
-        #bot_response = response.get('result')  # Antag att svaret finns i 'result'
+    if user_id not in user_sessions:
+        return jsonify({"error": "User not logged in"}), 401
 
-        #return jsonify({"response": bot_response}), 200
-        return jsonify({"response": response}), 200
-    else:
-        return jsonify({"error": "No message provided"}), 400
-
-
-@api.route('/upload_log', methods=['POST'])
-def upload():
     # Kontrollera om en fil har laddats upp
     if 'logfile' not in request.files:
         return jsonify({"error": "No file part"}), 400
@@ -56,59 +50,81 @@ def upload():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
 
-    if file:
-        embeddings = setup_embeddings(use_nvidia=use_nvidia)
-        data = load_document(file)
+    # conf
+    model_name = "llama3.2"
+    base_url = "http://127.0.0.1:11434"
+    template = ""
+    complete_instruction = f"{template} {chat_instruction}"
 
-        # Split document and create vector store
-        chunks = split_documents(data)
-        vector_db = setup_vector_db(chunks, embeddings)
-        return jsonify({"message": "File uploaded successfully"}), 200
+    # Setup Ollama model
+    ollama_instance = setup_ollama_model(complete_instruction, base_url=base_url, model=model_name)
+
+    # Setup embeddings
+    use_nvidia = True  # Change based on the system you use
+    use_cpu = False
+    embedding = setup_embeddings(use_nvidia=use_nvidia, use_cpu=use_cpu)
+
+    # prepare file for vector storage
+    log_file_path = Path(file.filename)
+    file.save(log_file_path)  # Save file temporarily
+    data = load_document(log_file_path)
+    chunks = split_documents(data)
+
+    user_directory = user_sessions[user_id]["user_directory"]
+    if user_directory.exists():
+        vector_db = load_vector_db(get_user_id(), embedding)
+    else:
+        vector_db = setup_vector_db(chunks, embedding, persist_directory=user_directory)
+
+    # spara info om användaren
+    user_sessions[user_id]['ollama_instance'] = ollama_instance
+    user_sessions[user_id]['vector_db'] = vector_db
+
+    return jsonify({"message": "File uploaded successfully"}), 200
 
 
+# Chat Route
+@api.route('/chat', methods=['POST'])
+def chat():
+    user_id = request.args.get('user_id')
 
-def start_ollama(chat_instructions):
-        complete_instruction = chat_instructions + temple
-        ollama_instance = setup_ollama_model(base_url=base_url,
-                                                                    model=model_name,
-                                                                    complete_instruction=complete_instruction)
+    if user_id not in user_sessions:
+        return jsonify({"error": "User not logged in"}), 401
 
-@api.route('/todo', methods=['POST'])
-def chat(ollama_instance, vector_db ):
     data = request.get_json()
     user_message = data.get('message')
 
-    if user_message:
-        # Skicka meddelandet till Ollama-instansen och få ett svar
-        qachain = setup_qa_chain(ollama_instance, vector_db)
-
-        question = input("Ask a question\n")
-        while(response != "bye"):
-            response = qachain({"query": question})
-            print(f"Answer: {response['result']}")
-        #bot_response = response.get('result')  # Antag att svaret finns i 'result'
-
-        #return jsonify({"response": bot_response}), 200
-        return jsonify({"response": response}), 200
-    else:
+    if not user_message:
         return jsonify({"error": "No message provided"}), 400
 
+    # Retrieve the model and vector DB from the session
+    ollama_instance = user_sessions[user_id]['ollama_instance']
+    vector_db = user_sessions[user_id]['vector_db']
+    embeddings = setup_embeddings() # spelar ingen roll att denna skapas igen
 
-@api.route('/start', methods=['POST'])        #To get chat instruction PRE CHAT
-def start():
-    data = request.get_json()
-    user_message = data.get('message')
+    if ollama_instance is None or vector_db is None:
+        return jsonify({"error": "Model or Vector DB not initialized"}), 500
 
-    if user_message:
-        print("START MESSAGE: ", user_message)      #FOR TESTING
-@api.route('/start', methods=['POST'])        #To get chat instruction PRE CHAT
-def start():
-    data = request.get_json()
-    user_message = data.get('message')
+    # Set up QA chain
+    qachain = setup_qa_chain(ollama_instance, vector_db)
 
-    if user_message:
-        print("START MESSAGE: ", user_message)      #FOR TESTING
+    # conversation loop
+    while True:
+        question = input("Ask a question (or type 'exit' to quit):\n")
+        if question.lower() == 'exit':
+            break
 
+        # get response
+        response = qachain({"query": user_message})
+
+        # get answer
+        answer = response['result']
+        print(f"Answer: {answer}")
+
+    # Store the interaction in the vector DB
+    persistent_storage(user_message, answer, user_id, embeddings, vector_db)
+
+    return jsonify({"response": answer}), 200
 
 
 if __name__ == '__main__':
