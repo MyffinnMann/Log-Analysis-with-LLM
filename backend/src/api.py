@@ -39,19 +39,25 @@ def login():
 @api.route('/setup', methods=['POST'])
 def setup_for_chat():
     user_id = request.args.get('user_id')
-    chat_instruction = request.form.get('chat_instruction') # ska komma från web interface
+    chat_instruction = request.form.get('chat-instruction')  # Ska komma från web interface
 
-    if user_id not in user_sessions:
-        return jsonify({"error": "User not logged in"}), 401
+    # Kontrollera om user_id är giltigt (om du väljer att aktivera den koden igen)
+    # if user_id is None or user_id not in user_sessions:
+    #     return jsonify({"error": "User not logged in or user_id is invalid"}), 401
 
     # Kontrollera om en fil har laddats upp
     if 'logfile' not in request.files:
+        print("No file part")
         return jsonify({"error": "No file part"}), 400
 
     file = request.files['logfile']
 
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
+
+    # Skriv ut chat-instruktioner och filnamn
+    print(f"Chat Instruction: {chat_instruction}")
+    print(f"Uploaded File: {file.filename}")
 
     # conf
     model_name = "llama3.2"
@@ -63,27 +69,31 @@ def setup_for_chat():
     ollama_instance = setup_ollama_model(complete_instruction, base_url=base_url, model=model_name)
 
     # Setup embeddings
-    use_nvidia = True  # Change based on the system you use
+    use_nvidia = False  # Change based on the system you use
     use_cpu = False
     embedding = setup_embeddings(use_nvidia=use_nvidia, use_cpu=use_cpu)
 
-    # prepare file for vector storage
+    # Förbered filen för vektorlagring
     log_file_path = Path(file.filename)
-    file.save(log_file_path)  # Save file temporarily
+    file.save(log_file_path)  # Spara filen temporärt
     data = load_document(log_file_path)
     chunks = split_documents(data)
+    
+    # user_directory = user_sessions[user_id]["user_directory"]
+    # if user_directory.exists():
+    #     vector_db = load_vector_db(get_user_id(), embedding)
+    # else:
+    #     vector_db = setup_vector_db(chunks, embedding, persist_directory=user_directory)
 
-    user_directory = user_sessions[user_id]["user_directory"]
-    if user_directory.exists():
-        vector_db = load_vector_db(get_user_id(), embedding)
-    else:
-        vector_db = setup_vector_db(chunks, embedding, persist_directory=user_directory)
+    # # spara info om användaren
+    # user_sessions[user_id]['ollama_instance'] = ollama_instance
+    # user_sessions[user_id]['vector_db'] = vector_db
 
-    # spara info om användaren
-    user_sessions[user_id]['ollama_instance'] = ollama_instance
-    user_sessions[user_id]['vector_db'] = vector_db
+    # Spara info om användaren
+    #user_sessions[user_id]['ollama_instance'] = ollama_instance
 
     return jsonify({"message": "File uploaded successfully"}), 200
+
 
 
 # Chat Route
