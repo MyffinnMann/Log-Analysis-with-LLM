@@ -1,12 +1,15 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import sql as sql
+import DB
 from modular import *
 
 # flask application startup
 api = Flask(__name__)
 CORS(api)
 
+
+DB.create_tables()
+DB.insert_test_values()
 # håll info för session
 user_sessions= {}
 
@@ -17,7 +20,7 @@ def login():
     username = data.get('username')
     password = data.get('password')
 
-    Bo_value = sql.check_login(username, password)
+    Bo_value = DB.check_login(username, password)
     if Bo_value:
         user_id = get_user_id() # TEMP VET INTE VAR DENNA SKA KOMMA FRÅN
         user_directory = Path("backend/db") / user_id
