@@ -75,6 +75,16 @@ def setup_for_chat():
     file.save(log_file_path)  # Spara filen temporärt
     data = load_document(log_file_path)
     chunks = split_documents(data)
+    
+    # user_directory = user_sessions[user_id]["user_directory"]
+    # if user_directory.exists():
+    #     vector_db = load_vector_db(get_user_id(), embedding)
+    # else:
+    #     vector_db = setup_vector_db(chunks, embedding, persist_directory=user_directory)
+
+    # # spara info om användaren
+    # user_sessions[user_id]['ollama_instance'] = ollama_instance
+    # user_sessions[user_id]['vector_db'] = vector_db
 
     # Spara info om användaren
     #user_sessions[user_id]['ollama_instance'] = ollama_instance
