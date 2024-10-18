@@ -28,59 +28,45 @@
         <p>&copy; 2024 SecureLang Logs (SLL)</p>
     </footer>
 
-    <script>
+    <script> 
         const startBtn = document.getElementById('start-btn');
         const chatInstructionsInput = document.getElementById('chat-instructions');
         const logfileInput = document.getElementById('logfile');
-
+    
         // Enable Start Conversation button if a file is selected
         logfileInput.addEventListener('change', () => {
             startBtn.disabled = logfileInput.files.length === 0; // Enable if a file is selected
         });
-
+    
         // Function to handle start conversation
         startBtn.addEventListener('click', async () => {
             if (logfileInput.files.length > 0) {
                 const formData = new FormData();
                 formData.append('logfile', logfileInput.files[0]);
-
-                // Upload the log file
-                const fileResponse = await fetch('http://localhost:5000/upload_log', {
+    
+                // Lägg till chat-instruktioner i FormData
+                const instructions = chatInstructionsInput.value.trim();
+                if (instructions) {
+                    formData.append('chat-instruction', instructions); // Lägg till instruktioner
+                }
+    
+                // Skicka både fil och chat-instruktioner
+                const fileResponse = await fetch('http://localhost:5000/setup', {
                     method: 'POST',
                     body: formData
                 });
-
+    
                 const fileResult = await fileResponse.json();
-
+    
                 if (fileResponse.ok) {
-                    alert(fileResult.message); // Display success message for file upload
+                    //alert(fileResult.message); // Visa framgångsmeddelande för filuppladdning
+                    // Redirect to chat page
+                    window.location.href = 'chat.html'; // Redirect to chat page
                 } else {
-                    alert(`File Upload Error: ${fileResult.error}`); // Display error message for file upload
-                    return; // Stop execution if file upload fails
+                    alert(`File Upload Error: ${fileResult.error}`); // Visa felmeddelande för filuppladdning
                 }
-
-                // Send chat instructions if they exist
-                const instructions = chatInstructionsInput.value.trim();
-                if (instructions) {
-                    const instructionsResponse = await fetch('http://localhost:5000/start', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message:instructions })
-                    });
-
-                    const instructionsResult = await instructionsResponse.json();
-
-                    /*if (instructionsResponse.ok) {
-                        alert(instructionsResult.message); // Display success message for instructions
-                    } else {
-                        alert(`Instructions Send Error: ${instructionsResult.error}`); // Display error message for instructions
-                    }*/
-                }
-
-                // Redirect to chat page
-                window.location.href = 'chat.html'; // Redirect to chat page
             } else {
-                alert('Please select a log file before starting the conversation.');
+                //alert('Please select a log file before starting the conversation.');
             }
         });
     </script>
