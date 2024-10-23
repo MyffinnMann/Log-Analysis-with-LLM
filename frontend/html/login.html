@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureLang Logs (SLL) - Login</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body id="login">
     <header class="page-header">
@@ -25,11 +25,11 @@
         </form>
         <div id="errorMessage" style="color:red; display:none;">Felaktiga inloggningsuppgifter!</div>
     </main>
-    
+
     <footer class="page-footer">
         <p>&copy; 2024 SecureLang Logs (SLL)</p>
     </footer>
-    
+
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function (event) {
@@ -52,7 +52,7 @@
 
                 if (response.ok && result.success) {
                     // Omdirigera användaren till chat-sidan om inloggningen lyckas
-                    window.location.href = './PRE_chat.html';
+                    window.location.href = '/PRE_chat.html';
                 } else {
                     // Visa felmeddelande om inloggningen misslyckas
                     document.getElementById('errorMessage').style.display = 'block';
