@@ -78,33 +78,15 @@ def insert_test_values():
     finally:
         conn.close()
 
-def get_all_answer(username, token):
-    try:
-        conn = connect()
-        cursor = conn.cursor()
-        cursor.execute('''
-        SELECT Question, ans FROM Question_Answers WHERE user_ID = (SELECT ID FROM user WHERE Username = ?);
-        ''', (username,))
-        rows = cursor.fetchall()
-        conn.close()
-        return rows
-    except:
-        print("error fetching answers")
-    finally:
-        conn.close()
 
-def get_all_files(username):
-    try:
-        conn = connect()
-        cursor = conn.cursor()
-        cursor.execute('''
-        SELECT file_name, file_hash FROM Files WHERE user_ID = (SELECT ID FROM user WHERE Username = ?);
-        ''', (username,))
-        rows = cursor.fetchall()
-        conn.close()
-        return rows
-    except:
-        print("error fetching files")
-    finally:
-        conn.close()
 
+def get_user_id_DB(username):
+    db = connect()
+    cursor = db.cursor()
+    sql_query = """SELECT ID FROM user WHERE Username = ?"""
+    try:
+        cursor.execute(sql_query, (username,))
+        user_id = cursor.fetchone()[0]
+    except:
+        return False
+    return user_id
