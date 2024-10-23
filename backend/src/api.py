@@ -1,17 +1,47 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory, url_for, redirect, session
 from flask_cors import CORS
 import DB
 from modular import *
+from datetime import timedelta
 
 # flask application startup
 api = Flask(__name__)
 CORS(api)
 
+# create db
+DB_PATH = Path("/backend/db/securelang.db")
+if not DB_PATH.exists():
+    DB.create_tables()
+    DB.insert_test_values()
 
-DB.create_tables()
-DB.insert_test_values()
-# håll info för session
-user_sessions= {}
+api.secret_key = "hello"
+api.permanent_session_lifetime = timedelta(minutes=60)
+HTML_DIR = Path("../../frontend/html")
+
+# route to index.html (located in frontend folder)
+@api.route('/')
+def index():
+    return send_from_directory(HTML_DIR, 'index.html')
+
+@api.route('/login.html')
+def login_html():
+    if "user_id" in session:
+        return send_from_directory(HTML_DIR, 'PRE_chat.html')
+    else:
+        return send_from_directory(HTML_DIR, 'login.html')
+
+@api.route('/chat.html')
+def chat_html():
+    if "user_id" in session:
+        return jsonify({"error": "User not logged in"}), 400
+    return send_from_directory(HTML_DIR, 'chat.html')
+
+@api.route('/PRE_chat.html')
+def pre_chat():
+    if "user_id" in session:
+        return send_from_directory(HTML_DIR, 'PRE_chat.html')
+    else:
+        return send_from_directory(HTML_DIR, 'login.html')
 
 # login
 @api.route('/login', methods=['POST'])
@@ -22,14 +52,14 @@ def login():
 
     Bo_value = DB.check_login(username, password)
     if Bo_value:
-        user_id = get_user_id() # TEMP VET INTE VAR DENNA SKA KOMMA FRÅN
-        user_directory = Path("backend/db") / user_id
+        global user_id
+        user_id = DB.get_user_id_DB(username)
+        user_directory = Path(f"../backend/db/{user_id}")
 
-        user_sessions[user_id] = {
-            "user_directory": user_directory,
-            "vector_db": None,  # håller
-            "ollama_instance": None  # håller
-        }
+        # Store user session data
+        session['user_directory'] = str(user_directory)
+        session['vector_db'] = None
+        session['ollama_instance'] = None
 
         return jsonify({"success": True, "user_id": user_id}), 200
     else:
@@ -38,16 +68,13 @@ def login():
 # pre chat
 @api.route('/setup', methods=['POST'])
 def setup_for_chat():
-    user_id = request.args.get('user_id')
+    user_id = request.get('user_id')
     chat_instruction = request.form.get('chat-instruction')  # Ska komma från web interface
 
-    # Kontrollera om user_id är giltigt (om du väljer att aktivera den koden igen)
-    # if user_id is None or user_id not in user_sessions:
-    #     return jsonify({"error": "User not logged in or user_id is invalid"}), 401
+    if not user_id:
+        return jsonify({"error": "User not logged in"}), 401
 
-    # Kontrollera om en fil har laddats upp
     if 'logfile' not in request.files:
-        print("No file part")
         return jsonify({"error": "No file part"}), 400
 
     file = request.files['logfile']
@@ -69,7 +96,7 @@ def setup_for_chat():
     ollama_instance = setup_ollama_model(complete_instruction, base_url=base_url, model=model_name)
 
     # Setup embeddings
-    use_nvidia = False  # Change based on the system you use
+    use_nvidia = True  # Change based on the system you use
     use_cpu = False
     embedding = setup_embeddings(use_nvidia=use_nvidia, use_cpu=use_cpu)
 
@@ -78,30 +105,23 @@ def setup_for_chat():
     file.save(log_file_path)  # Spara filen temporärt
     data = load_document(log_file_path)
     chunks = split_documents(data)
-    
-    # user_directory = user_sessions[user_id]["user_directory"]
-    # if user_directory.exists():
-    #     vector_db = load_vector_db(get_user_id(), embedding)
-    # else:
-    #     vector_db = setup_vector_db(chunks, embedding, persist_directory=user_directory)
 
-    # # spara info om användaren
-    # user_sessions[user_id]['ollama_instance'] = ollama_instance
-    # user_sessions[user_id]['vector_db'] = vector_db
+    user_directory = Path(session["user_directory"])
+    if user_directory.exists():
+        vector_db = load_vector_db(user_id, embedding)
+    else:
+        vector_db = setup_vector_db(chunks, embedding, persist_directory=user_directory)
 
-    # Spara info om användaren
-    #user_sessions[user_id]['ollama_instance'] = ollama_instance
-
-    return jsonify({"message": "File uploaded successfully"}), 200
-
-
+    # update user_sessions per user
+    session['ollama_instance'] = ollama_instance
+    session['vector_db'] = vector_db
 
 # Chat Route
 @api.route('/chat', methods=['POST'])
 def chat():
     user_id = request.args.get('user_id')
 
-    if user_id not in user_sessions:
+    if not user_id:
         return jsonify({"error": "User not logged in"}), 401
 
     data = request.get_json()
@@ -111,8 +131,8 @@ def chat():
         return jsonify({"error": "No message provided"}), 400
 
     # Retrieve the model and vector DB from the session
-    ollama_instance = user_sessions[user_id]['ollama_instance']
-    vector_db = user_sessions[user_id]['vector_db']
+    ollama_instance = session.get('ollama_instance')
+    vector_db = session.get('vector_db')
     embeddings = setup_embeddings() # spelar ingen roll att denna skapas igen
 
     if ollama_instance is None or vector_db is None:
@@ -138,7 +158,6 @@ def chat():
     persistent_storage(user_message, answer, user_id, embeddings, vector_db)
 
     return jsonify({"response": answer}), 200
-
 
 if __name__ == '__main__':
     api.run(debug=True)

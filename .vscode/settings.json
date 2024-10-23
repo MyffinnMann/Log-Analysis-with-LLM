@@ -6,10 +6,12 @@
         "huggingface",
         "jsonify",
         "llms",
+        "logfile",
         "mpnet",
         "Ollama",
         "Proxifier",
         "qachain",
+        "securelang",
         "torchaudio",
         "torchvision",
         "vectorstores"
