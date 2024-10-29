@@ -57,6 +57,7 @@ def login():
         user_directory = Path(f"../backend/db/{user_id}")
 
         # Store user session data
+        session["user_id"] = user_id
         session['user_directory'] = str(user_directory)
         session['vector_db'] = None
         session['ollama_instance'] = None
@@ -67,8 +68,8 @@ def login():
 
 # pre chat
 @api.route('/setup', methods=['POST'])
-def setup_for_chat():
-    user_id = request.get('user_id')
+def setup():
+    user_id = session["user_id"]
     chat_instruction = request.form.get('chat-instruction')  # Ska komma från web interface
 
     if not user_id:

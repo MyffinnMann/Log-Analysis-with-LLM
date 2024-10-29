@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureLang Logs (SLL)</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css">
 </head>
 <body>
     <header class="page-header">
@@ -51,7 +51,7 @@
                 }
 
                 // Skicka både fil och chat-instruktioner
-                const fileResponse = await fetch('http://localhost:127.0.0.1/setup', {
+                const fileResponse = await fetch('http://127.0.0.1:5000/setup', {
                     method: 'POST',
                     body: formData
                 });
@@ -59,7 +59,7 @@
                 const fileResult = await fileResponse.json();
 
                 if (fileResponse.ok) {
-                    //alert(fileResult.message); // Visa framgångsmeddelande för filuppladdning
+                    alert(fileResult.message); // Visa framgångsmeddelande för filuppladdning
                     // Redirect to chat page
                     window.location.href = 'chat.html'; // Redirect to chat page
                 } else {
