@@ -10,7 +10,7 @@ import torch_directml
 from datetime import datetime
 
 def get_user_id(): # detta id kan vara token?
-    return "User_2"
+    return "User_1"
 
 def setup_ollama_model(complete_instruction,
                                         base_url="http://127.0.0.1:11434",

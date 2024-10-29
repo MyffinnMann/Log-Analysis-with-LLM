@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureLang Logs (SLL)</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header class="page-header">
@@ -39,7 +39,7 @@
         });
 
         // Function to handle start conversation
-        startBtn.addEventListener('click',  () => {
+        startBtn.addEventListener('click', async () => {
             if (logfileInput.files.length > 0) {
                 const formData = new FormData();
                 formData.append('logfile', logfileInput.files[0]);
@@ -51,16 +51,16 @@
                 }
 
                 // Skicka både fil och chat-instruktioner
-                const fileResponse =  fetch('http://127.0.0.1:5000/setup', {
+                const fileResponse = await fetch('http://127.0.0.1:5000/setup', {
                     method: 'POST',
                     body: formData
                 });
 
-                const fileResult = fileResponse.json();
+                const fileResult = await fileResponse.json();
 
                 if (fileResponse.ok) {
                     alert(fileResult.message); // Visa framgångsmeddelande för filuppladdning
-                    //Redirect to chat page
+                    // Redirect to chat page
                     window.location.href = 'chat.html'; // Redirect to chat page
                 } else {
                     alert(`File Upload Error: ${fileResult.error}`); // Visa felmeddelande för filuppladdning
