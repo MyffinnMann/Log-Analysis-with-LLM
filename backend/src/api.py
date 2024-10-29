@@ -54,7 +54,7 @@ def login():
     if Bo_value:
         global user_id
         user_id = DB.get_user_id_DB(username)
-        user_directory = Path(f"../backend/db/{user_id}")
+        user_directory = Path(f"../db/User_1")
 
         # Store user session data
         session["user_id"] = user_id
@@ -106,16 +106,18 @@ def setup():
     file.save(log_file_path)  # Spara filen temporärt
     data = load_document(log_file_path)
     chunks = split_documents(data)
-
     user_directory = Path(session["user_directory"])
-    if user_directory.exists():
-        vector_db = load_vector_db(user_id, embedding)
-    else:
-        vector_db = setup_vector_db(chunks, embedding, persist_directory=user_directory)
+
+    #if user_directory.exists():
+    #    vector_db = load_vector_db(session["user_id"], embedding)
+    #else:
+    vector_db = setup_vector_db(chunks, embedding, persist_directory=user_directory)
 
     # update user_sessions per user
     session['ollama_instance'] = ollama_instance
     session['vector_db'] = vector_db
+
+    return redirect(url_for('chat'))
 
 # Chat Route
 @api.route('/chat', methods=['POST'])
