@@ -6,7 +6,7 @@ from datetime import timedelta
 
 # flask application startup
 api = Flask(__name__)
-CORS(api)
+CORS(api, supports_credentials=True)
 
 user_data = {}
 
@@ -45,9 +45,13 @@ def login():
     username = data.get('username')
     password = data.get('password')
 
+    session["username"] = username
+    session["password"] = password
+
     Bo_value = DB.check_login(username, password)
     if Bo_value:
         user_id = DB.get_user_id_DB(username)
+        session["user_id"] = user_id
         user_directory = Path(f"../db/{user_id}")
 
         # Store user session data
@@ -65,15 +69,18 @@ def login():
 # pre chat
 @api.route('/setup', methods=['POST'])
 def setup():
+    chat_instruction = request.form.get('chat-instruction')
+    user_id = session.get("user_id")
+
     if 'logfile' not in request.files:
         return jsonify({"error": "No file part"}), 400
+
     file = request.files["logfile"]
+
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
 
-    user_id = request.get_json("user_id")
-    chat_instruction = request.form.get('chat-instruction')
-
+    print(user_data)
     if user_id not in user_data:
         return jsonify({"error": "User not logged in"}), 401 # ha denna som reroute till login.html ist?
 
