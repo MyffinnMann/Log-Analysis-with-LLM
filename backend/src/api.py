@@ -37,7 +37,6 @@ def chat_html():
 def pre_chat():
     return send_from_directory(HTML_DIR, 'PRE_chat.html')
 
-
 # login
 @api.route('/login', methods=['POST'])
 def login():
@@ -80,13 +79,8 @@ def setup():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
 
-    print(user_data)
     if user_id not in user_data:
         return jsonify({"error": "User not logged in"}), 401 # ha denna som reroute till login.html ist?
-
-    user_directory = user_data[user_id]['user_directory']
-    log_file_path = user_directory / file.filename
-    file.save(log_file_path)
 
     # conf
     model_name = "llama3.2"
@@ -102,7 +96,11 @@ def setup():
     use_cpu = False
     embedding = setup_embeddings(use_nvidia=use_nvidia, use_cpu=use_cpu)
 
+    print(user_data)
     # Förbered filen för vektorlagring
+    log_file_path = Path(file.filename)
+    file.save(log_file_path)
+    user_directory = user_data[user_id]['user_directory']
     data = load_document(log_file_path)
     chunks = split_documents(data)
     if user_directory.exists():
