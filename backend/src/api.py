@@ -119,10 +119,10 @@ def setup():
     chunks = split_documents(data)
 
     user_directory = Path(f"../backend/db/{user_id}") # Path(session["user_directory"])
-    if user_directory.exists():
-        vector_db = load_vector_db(user_id, user_directory, collection_name="local", embeddings=embedding)
-    else:
-        vector_db = setup_vector_db(chunks, embedding, persist_directory=user_directory)
+    # if user_directory.exists():
+    #     vector_db = load_vector_db(user_id, user_directory, collection_name="local", embeddings=embedding)
+    # else:
+    vector_db = setup_vector_db(chunks, embedding, persist_directory=user_directory)
 
     # update user_sessions per user
     # session['ollama_instance'] = ollama_instance
