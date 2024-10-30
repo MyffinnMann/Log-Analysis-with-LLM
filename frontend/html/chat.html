@@ -5,6 +5,134 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureLang Logs (SLL)</title>
     <link rel="stylesheet" href="../css/style.css">
+<!-- ############################################################################################################### -->
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 100vh;
+    padding: 0;
+}
+
+.page-header {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    width: 100%;
+    padding: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.chat-container {
+    width: 70%;
+    max-width: 1000px;
+    height: calc(100vh - 140px);
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.chat-window {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chat-message {
+    padding: 10px 15px;
+    border-radius: 20px;
+    max-width: 75%;
+    word-wrap: break-word;
+}
+
+.bot {
+    background-color: #e5e5e5;
+    align-self: flex-start;
+    color: #333;
+}
+
+.user {
+    background-color: #333;
+    align-self: flex-end;
+    color: white;
+}
+
+.chat-input {
+    display: flex;
+    padding: 15px;
+    background-color: #f4f4f4;
+    border-top: 1px solid #ddd;
+    align-items: center;
+}
+
+#message-input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    outline: none;
+    margin-left: 10px;
+}
+
+#send-btn {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#send-btn:hover {
+    background-color: #222;
+}
+
+#attachment-btn {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-right: 10px;
+    font-size: 18px;
+    transition: background-color 0.3s;
+}
+
+#attachment-btn:hover {
+    background-color: #222;
+}
+
+.page-footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    width: 100%;
+    padding: 10px;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+</style>
+<!-- ############################################################################################################### -->
 </head>
 <body>
     <header class="page-header">
@@ -12,21 +140,16 @@
     </header>
     
     <div class="chat-container">
-        <!-- Chat window -->
         <div class="chat-window">
             <div class="chat-message bot">
                 <p>Hi, how can I assist you today?</p>
             </div>
         </div>
 
-        <!-- Message input area -->
         <div class="chat-input">
-            <!-- file upload form -->
             <form id="file-upload-form" enctype="multipart/form-data">
                 <input type="file" id="logfile" name="logfile" accept=".log">
-                <button id="attachment-btn" type="submit">
-                    📎
-                </button>
+                <button id="attachment-btn" type="submit">📎</button>
             </form>
 
             <input type="text" placeholder="Type your message..." id="message-input">
@@ -39,55 +162,38 @@
     </footer>
 
     <script>
+        // Check if the token exists, otherwise redirect to login
+        function checkAuth() {
+            if (!document.cookie.includes('token')) {
+                window.location.href = './login.html';  // Redirect to login page
+            }
+        }
+        // Run check on page load
+        // window.onload = checkAuth; // this will check for token before page loads.
+
+        // Add chat functionality (similar to the original one)
         const sendBtn = document.getElementById('send-btn');
         const messageInput = document.getElementById('message-input');
         const chatWindow = document.querySelector('.chat-window');
-        const fileUploadForm = document.getElementById('file-upload-form');
 
-        // Send the log file to Flask API
-        fileUploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const formData = new FormData(fileUploadForm);
-            const response = await fetch('http://localhost:5000/upload_log', {
-                method: 'POST',
-                body: formData
-            });
-
-            const result = await response.json();
-            const botMsgDiv = document.createElement('div');
-            botMsgDiv.classList.add('chat-message', 'bot');
-
-            if (response.ok) {
-                botMsgDiv.innerHTML = `<p>${result.message}</p>`; // Correct the key to access message
-            } else {
-                botMsgDiv.innerHTML = `<p>${result.error}</p>`;
-            }
-
-            chatWindow.appendChild(botMsgDiv);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        });
-
-        // Send user message to Flask API
         sendBtn.addEventListener('click', async () => {
             const userMessage = messageInput.value;
             if (userMessage.trim()) {
-                // Add user message to chat
                 const userMsgDiv = document.createElement('div');
                 userMsgDiv.classList.add('chat-message', 'user');
                 userMsgDiv.innerHTML = `<p>${userMessage}</p>`;
                 chatWindow.appendChild(userMsgDiv);
 
-                // Send user message to Flask API
-                const response = await fetch('http://localhost:5000/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: userMessage })  // Skickar meddelandet i rätt format
+
+                const response = await fetch('chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: userMessage }),
+                credentials: 'include',  // Add this line to include cookies
                 });
 
-                const result = await response.json(); // Reply from API
+                const result = await response.json();
 
-                // Add the reply to the chat window
                 if (response.ok) {
                     const botMsgDiv = document.createElement('div');
                     botMsgDiv.classList.add('chat-message', 'bot');
@@ -100,9 +206,7 @@
                     chatWindow.appendChild(botMsgDiv);
                 }
 
-                // Clear input
                 messageInput.value = '';
-                // Scroll to the bottom of the chat window
                 chatWindow.scrollTop = chatWindow.scrollHeight;
             }
         });

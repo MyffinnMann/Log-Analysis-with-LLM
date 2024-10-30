@@ -1,7 +1,8 @@
-from langchain_community.llms import Ollama
+# from langchain_community.llms import Ollama
+from langchain_ollama import OllamaLLM
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain.chains import RetrievalQA
 from pathlib import Path
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -14,16 +15,16 @@ def get_user_id(): # detta id kan vara token?
 
 def setup_ollama_model(complete_instruction,
                                         base_url="http://127.0.0.1:11434",
-                                        model="llama3.2",):
+                                        model="llama3.1:latest",):
     """Set up the Ollama LLM model instance."""
 
-    llm = Ollama(base_url=base_url,
+    llm = OllamaLLM(base_url=base_url,
                 model=model,
                 template=complete_instruction)
     return llm
 
 
-def setup_embeddings(use_nvidia=True, use_cpu=False):
+def setup_embeddings(use_nvidia=False, use_cpu=True):
     """Set up embedding model; can toggle between HuggingFace and Ollama embeddings."""
     if use_nvidia and not use_cpu:
         return HuggingFaceEmbeddings(show_progress=True,
@@ -65,7 +66,7 @@ def setup_qa_chain(llm_instance, vector_db):
 
 def persistent_storage(question, answer, user_id, embeddings, vector_db):
     """Store relevant information on a user so that communication can be personalized"""
-    timestamp = datetime.now()
+    timestamp = str(datetime.now())
 
     # create embedding so they can be stored
     question_embedding = embeddings.embed_query(question)
@@ -84,8 +85,8 @@ def persistent_storage(question, answer, user_id, embeddings, vector_db):
         embeddings=[answer_embedding],
         metadatas=[{"user_id": user_id, "interaction_type": "answer", "timestamp": timestamp}]
     )
-
-    vector_db.persist()
+    print("DEBUGGGGGGGGGGGGGG exiting persistent_storage() function") # DEBUGGGGGGGGGGGGGG
+    return
 
 def load_vector_db(user_id, persist_directory_base="backend/db", collection_name="local", embeddings=None):
     """Load an existing user-specific persistent vector database."""
@@ -107,10 +108,10 @@ def main():
     template = "You are a network administrator and your job is to find threats inside log files, be thorough and keep the system secure"
     complete_instruction = f"{template} {chat_instruction}"
 
-    log_file_path = Path(__file__).with_name("Proxifier.log")  # path
-    use_nvidia = True  # sätt till false för amd
-    use_cpu = False # sätt till True om inte har dedikerat GPU
-    model_name = "llama3.2"
+    log_file_path = Path(__file__).with_name("test.log")  # path
+    use_nvidia = False  # sätt till false för amd
+    use_cpu = True # sätt till True om inte har dedikerat GPU
+    model_name = "llama3.1:latest"
     base_url = "http://127.0.0.1:11434"
     user_id = get_user_id()
 
@@ -142,15 +143,21 @@ def main():
         if question.lower() == 'exit':
             break
 
-        # get response
-        response = qachain({"query": question})
+        try:
+            # Use invoke to ensure compatibility with the updated method
+            response = qachain.invoke({"query": question})
+            print("Raw response from QA chain:", response)
 
-        # get answer
-        answer = response['result']
-        print(f"Answer: {answer}")
+            # Extract answer and print it
+            answer = response['result']
+            print(f"Answer: {answer}")
 
-        # store interaction in Chroma DB
-        persistent_storage(question, answer, user_id, embeddings, vector_db)
+            # Store interaction in Chroma DB
+            persistent_storage(question, answer, user_id, embeddings, vector_db)
+
+        except Exception as e:
+            print("Error during QA chain invocation:", e)
+            break
 
 if __name__ == "__main__":
     main()
