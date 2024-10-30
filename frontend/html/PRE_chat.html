@@ -47,16 +47,8 @@
                 const formData = new FormData();
                 formData.append('logfile', logfileInput.files[0]);
 
-
-                // Lägg till chat-instruktioner i FormData
-                const instructions = chatInstructionsInput.value.trim();
-                if (instructions) {
-                    formData.append('chat-instruction', instructions); // Lägg till instruktioner
-                }
-
-
-                // Skicka både fil och chat-instruktioner
-                const fileResponse = await fetch('http://127.0.0.1:5000/setup', {
+                // Upload the log file
+                const fileResponse = await fetch('http://localhost:5000/setup', {
                     method: 'POST',
                     body: formData
                 });
@@ -70,8 +62,30 @@
                     // Redirect to chat page
                     window.location.href = 'chat.html'; // Redirect to chat page
                 } else {
-                    alert(`File Upload Error: ${fileResult.error}`); // Visa felmeddelande för filuppladdning
+                    alert(`File Upload Error: ${fileResult.error}`); // Display error message for file upload
+                    return; // Stop execution if file upload fails
                 }
+
+                // // Send chat instructions if they exist
+                // const instructions = chatInstructionsInput.value.trim();
+                // if (instructions) {
+                //     const instructionsResponse = await fetch('http://localhost:5000/start', {
+                //         method: 'POST',
+                //         headers: { 'Content-Type': 'application/json' },
+                //         body: JSON.stringify({ message:instructions })
+                //     });
+
+                //     const instructionsResult = await instructionsResponse.json();
+
+                //     /*if (instructionsResponse.ok) {
+                //         alert(instructionsResult.message); // Display success message for instructions
+                //     } else {
+                //         alert(`Instructions Send Error: ${instructionsResult.error}`); // Display error message for instructions
+                //     }*/
+                // }
+
+                // Redirect to chat page
+                window.location.href = 'chat.html'; // Redirect to chat page
             } else {
                 //alert('Please select a log file before starting the conversation.');
             }

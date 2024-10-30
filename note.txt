@@ -1,0 +1,19 @@
+flask library send_from_directory does not include css files.
+solution 1:
+    put css and html code in the same html file
+solution 2:
+    add routes to the css files
+
+UPDATE:
+# added GET route to all css and html files
+# update javascript in login.html:
+    # on successful login it will do a GET request to /chat route.
+        # window.location.href = 'http://10.0.2.15:5000/chat';
+
+# browser would not save the jwt token locally because its running on localhost
+    # changed flask to run on pc ip address instead of localhost
+    # use nginx as reverse proxy // NOT IMPLEMENTED YET.
+
+# error from torch:
+    # temp solution: changed cpu to be default in embedings:
+        # def setup_embeddings(use_nvidia=False, use_cpu=True):

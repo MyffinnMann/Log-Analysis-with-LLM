@@ -11,8 +11,8 @@ def connect():
     except sqlite3.Error as error:
         print("Kunde inte ansluta till databasen:", error)
 
-def hash_pas(password):
-    return ph.hash(password)
+def hash_pas(passwor):
+    return ph.hash(passwor)
 
 def verify_pas(stored_pas, given_pas):
     try:
@@ -26,9 +26,9 @@ def check_login(username, pas):
     sql_query = """SELECT Hash_PWD FROM Password
                     WHERE user_ID = (SELECT ID FROM user WHERE Username = ?)"""
     try:
-        cursor.execute(sql_query, (username,))
+        cursor.execute(sql_query, (username,))  
         stored_pas = cursor.fetchone()
-        Bo_value = verify_pas(stored_pas[0], pas)
+        Bo_value = verify_pas(stored_pas[0], pas)  
     except:
         return False
     return Bo_value
@@ -37,13 +37,13 @@ def create_tables():
     try:
         conn = connect()
         conn.execute('''
-        CREATE TABLE user (
+        CREATE TABLE user ( 
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
             Username TEXT NOT NULL
         );
         ''')
         conn.execute('''
-        CREATE TABLE Password (
+        CREATE TABLE Password ( 
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
             Hash_PWD TEXT NOT NULL,
             user_ID INTEGER,
@@ -61,7 +61,7 @@ def create_tables():
 def insert_test_values():
     try:
         conn = connect()
-
+        
         hash = ph.hash("test")
         conn.execute('''
         INSERT INTO user (Username) VALUES ('test_user');
@@ -69,24 +69,41 @@ def insert_test_values():
         conn.execute('''
         INSERT INTO Password (Hash_PWD, user_ID) VALUES (?, 1);
         ''', (hash,))
-
+                     
         conn.commit()
-        print("Test values inserted successfully")
+        print("Test values inserted successfully") 
 
     except:
         print("Test values already exists or error inserting test values")
     finally:
         conn.close()
 
-
-
-def get_user_id_DB(username):
-    db = connect()
-    cursor = db.cursor()
-    sql_query = """SELECT ID FROM user WHERE Username = ?"""
+def get_all_answer(username, token):
     try:
-        cursor.execute(sql_query, (username,))
-        user_id = cursor.fetchone()[0]
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute('''
+        SELECT Question, ans FROM Question_Answers WHERE user_ID = (SELECT ID FROM user WHERE Username = ?);
+        ''', (username,))
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
     except:
-        return False
-    return user_id
+        print("error fetching answers")
+    finally:
+        conn.close()
+
+def get_all_files(username):
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute('''
+        SELECT file_name, file_hash FROM Files WHERE user_ID = (SELECT ID FROM user WHERE Username = ?);
+        ''', (username,))
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
+    except:
+        print("error fetching files")
+    finally:
+        conn.close()
