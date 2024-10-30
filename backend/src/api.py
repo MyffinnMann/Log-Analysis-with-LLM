@@ -90,6 +90,7 @@ def setup():
 
     # Setup Ollama model
     ollama_instance = setup_ollama_model(complete_instruction, base_url=base_url, model=model_name)
+    user_data[user_id]['ollama_instance'] = ollama_instance
 
     # Setup embeddings
     use_nvidia = True  # Change based on the system you use
@@ -104,12 +105,10 @@ def setup():
     data = load_document(log_file_path)
     chunks = split_documents(data)
     if user_directory.exists():
-        vector_db = load_vector_db(session["user_id"], embedding)
+        vector_db = load_vector_db(user_directory, embedding)
     else:
         vector_db = setup_vector_db(chunks, embedding, persist_directory=user_directory)
 
-    # update user_sessions per user
-    user_data[user_id]['ollama_instance'] = ollama_instance
     user_data[user_id]['vector_db'] = vector_db
 
     return jsonify({"success": True, "message": "Setup complete. Ready to chat."}), 200
