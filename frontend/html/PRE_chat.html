@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureLang Logs (SLL)</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header class="page-header">
@@ -29,14 +29,17 @@
     </footer>
 
     <script>
+    <script>
         const startBtn = document.getElementById('start-btn');
         const chatInstructionsInput = document.getElementById('chat-instructions');
         const logfileInput = document.getElementById('logfile');
+
 
         // Enable Start Conversation button if a file is selected
         logfileInput.addEventListener('change', () => {
             startBtn.disabled = logfileInput.files.length === 0; // Enable if a file is selected
         });
+
 
         // Function to handle start conversation
         startBtn.addEventListener('click', async () => {
@@ -50,10 +53,14 @@
                     body: formData
                 });
 
+
                 const fileResult = await fileResponse.json();
 
+
                 if (fileResponse.ok) {
-                    alert(fileResult.message); // Display success message for file upload
+                    alert(fileResult.message); // Visa framgångsmeddelande för filuppladdning
+                    // Redirect to chat page
+                    window.location.href = 'chat.html'; // Redirect to chat page
                 } else {
                     alert(`File Upload Error: ${fileResult.error}`); // Display error message for file upload
                     return; // Stop execution if file upload fails
@@ -80,7 +87,7 @@
                 // Redirect to chat page
                 window.location.href = 'chat.html'; // Redirect to chat page
             } else {
-                alert('Please select a log file before starting the conversation.');
+                //alert('Please select a log file before starting the conversation.');
             }
         });
     </script>

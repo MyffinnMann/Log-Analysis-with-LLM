@@ -89,7 +89,7 @@ def setup():
     if 'logfile' not in request.files:
         return jsonify({"error": "No file part"}), 400
 
-    file = request.files['logfile']
+    file = request.files["logfile"]
 
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
@@ -146,6 +146,7 @@ def chat():
         return jsonify({"error": "User not logged in"}), 401
 
     data = request.get_json()
+    user_id = data.get('user_id')
     user_message = data.get('message')
 
     if not user_message:

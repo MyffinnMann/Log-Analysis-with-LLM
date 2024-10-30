@@ -11,7 +11,7 @@ import torch
 from datetime import datetime
 
 def get_user_id(): # detta id kan vara token?
-    return "User_2"
+    return "User_1"
 
 def setup_ollama_model(complete_instruction,
                                         base_url="http://127.0.0.1:11434",
@@ -85,12 +85,11 @@ def persistent_storage(question, answer, user_id, embeddings, vector_db):
         embeddings=[answer_embedding],
         metadatas=[{"user_id": user_id, "interaction_type": "answer", "timestamp": timestamp}]
     )
-    print("DEBUGGGGGGGGGGGGGG exiting persistent_storage() function") # DEBUGGGGGGGGGGGGGG
-    return
+
 
 def load_vector_db(user_id, persist_directory_base="backend/db", collection_name="local", embeddings=None):
     """Load an existing user-specific persistent vector database."""
-    persist_directory = Path(persist_directory_base) / user_id
+    persist_directory = Path(f"{persist_directory_base}/{user_id}")
     return Chroma(
         embedding_function=embeddings,
         persist_directory=str(persist_directory),
