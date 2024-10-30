@@ -29,14 +29,17 @@
     </footer>
 
     <script>
+    <script>
         const startBtn = document.getElementById('start-btn');
         const chatInstructionsInput = document.getElementById('chat-instructions');
         const logfileInput = document.getElementById('logfile');
+
 
         // Enable Start Conversation button if a file is selected
         logfileInput.addEventListener('change', () => {
             startBtn.disabled = logfileInput.files.length === 0; // Enable if a file is selected
         });
+
 
         // Function to handle start conversation
         startBtn.addEventListener('click', async () => {
@@ -44,11 +47,13 @@
                 const formData = new FormData();
                 formData.append('logfile', logfileInput.files[0]);
 
+
                 // Lägg till chat-instruktioner i FormData
                 const instructions = chatInstructionsInput.value.trim();
                 if (instructions) {
                     formData.append('chat-instruction', instructions); // Lägg till instruktioner
                 }
+
 
                 // Skicka både fil och chat-instruktioner
                 const fileResponse = await fetch('http://127.0.0.1:5000/setup', {
@@ -56,7 +61,9 @@
                     body: formData
                 });
 
+
                 const fileResult = await fileResponse.json();
+
 
                 if (fileResponse.ok) {
                     alert(fileResult.message); // Visa framgångsmeddelande för filuppladdning

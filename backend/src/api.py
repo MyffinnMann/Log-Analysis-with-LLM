@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify, send_from_directory, url_for, redirect, session
+from flask import Flask, request, jsonify, send_from_directory, url_for, redirect, session
 from flask_cors import CORS
 import DB
 from modular import *
+from datetime import timedelta
 from datetime import timedelta
 
 # flask application startup
@@ -93,6 +95,7 @@ def setup():
     user_data[user_id]['ollama_instance'] = ollama_instance
 
     # Setup embeddings
+    use_nvidia = True  # Change based on the system you use
     use_nvidia = True  # Change based on the system you use
     use_cpu = False
     embedding = setup_embeddings(use_nvidia=use_nvidia, use_cpu=use_cpu)
