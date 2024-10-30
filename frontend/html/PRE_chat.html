@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureLang Logs (SLL)</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header class="page-header">
@@ -29,14 +29,17 @@
     </footer>
 
     <script>
+    <script>
         const startBtn = document.getElementById('start-btn');
         const chatInstructionsInput = document.getElementById('chat-instructions');
         const logfileInput = document.getElementById('logfile');
+
 
         // Enable Start Conversation button if a file is selected
         logfileInput.addEventListener('change', () => {
             startBtn.disabled = logfileInput.files.length === 0; // Enable if a file is selected
         });
+
 
         // Function to handle start conversation
         startBtn.addEventListener('click', async () => {
@@ -44,22 +47,26 @@
                 const formData = new FormData();
                 formData.append('logfile', logfileInput.files[0]);
 
+
                 // Lägg till chat-instruktioner i FormData
                 const instructions = chatInstructionsInput.value.trim();
                 if (instructions) {
                     formData.append('chat-instruction', instructions); // Lägg till instruktioner
                 }
 
+
                 // Skicka både fil och chat-instruktioner
-                const fileResponse = await fetch('http://localhost:127.0.0.1/setup', {
+                const fileResponse = await fetch('http://127.0.0.1:5000/setup', {
                     method: 'POST',
                     body: formData
                 });
 
+
                 const fileResult = await fileResponse.json();
 
+
                 if (fileResponse.ok) {
-                    //alert(fileResult.message); // Visa framgångsmeddelande för filuppladdning
+                    alert(fileResult.message); // Visa framgångsmeddelande för filuppladdning
                     // Redirect to chat page
                     window.location.href = 'chat.html'; // Redirect to chat page
                 } else {
