@@ -146,8 +146,8 @@ def setup():
         'vector_db': vector_db,
         'ollama_instance': ollama_instance
     }
-
-    return jsonify({"success": True, "message": "Setup completed successfully"}), 200
+    return jsonify({"Success": True}), 200 # kod 200 att det lyckades
+    #return jsonify({"success": True, "message": "Setup completed successfully"}), 200 # Kommentera även ut denna raden om du vill att meddelandet ska visas och godkännas när det lyckas
 
 # Chat Route
 @api.route('/chat', methods=['POST'])
