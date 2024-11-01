@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureLang Logs (SLL)</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 <!-- ############################################################################################################### -->
     <style>
         * {
@@ -166,7 +166,7 @@ body {
         // Check if the token exists, otherwise redirect to login
         function checkAuth() {
             if (!document.cookie.includes('token')) {
-                window.location.href = './login.html';  // Redirect to login page
+                window.location.href = '/login.html';  // Redirect to login page
             }
         }
         // Run check on page load
