@@ -19,12 +19,24 @@ if not DB_PATH.exists():
 api.secret_key = "hello"
 api.permanent_session_lifetime = timedelta(minutes=60)
 HTML_DIR = Path("../../frontend/html")
-CSS_DIR = Path("../../frontend/css")
+CSS_DIR = Path("../../frontend/html/css")
 # route to index.html (located in frontend folder)
 
 @api.route('/css/style.css', methods=["GET"])
 def getStylecss():
     return send_from_directory(CSS_DIR, 'style.css')
+
+@api.route('/css/chat.css', methods=["GET"])
+def getChatcss():
+    return send_from_directory(CSS_DIR, 'chat.css')
+
+@api.route('/css/index.css', methods=["GET"])
+def getIndexcss():
+    return send_from_directory(CSS_DIR, 'index.css')
+
+@api.route('/css/login.css', methods=["GET"])
+def getLogincss():
+    return send_from_directory(CSS_DIR, 'login.css')
 
 @api.route('/')
 def index():

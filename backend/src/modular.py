@@ -1,3 +1,10 @@
+"""Man ändrar GPU/CPU in denna filen"""
+
+#Längre ner i main() så ändrar du CPU/GPU rad 119
+
+
+
+
 # from langchain_community.llms import Ollama
 from langchain_ollama import OllamaLLM
 from langchain_community.document_loaders import TextLoader
@@ -15,7 +22,7 @@ def get_user_id(): # detta id kan vara token?
 
 def setup_ollama_model(complete_instruction,
                                         base_url="http://127.0.0.1:11434",
-                                        model="llama3.1:latest",):
+                                        model="llama3.2:latest",):
     """Set up the Ollama LLM model instance."""
 
     llm = OllamaLLM(base_url=base_url,
@@ -109,8 +116,8 @@ def main():
 
     log_file_path = Path(__file__).with_name("test.log")  # path
     use_nvidia = False  # sätt till false för amd
-    use_cpu = True # sätt till True om inte har dedikerat GPU
-    model_name = "llama3.1:latest"
+    use_cpu = False # sätt till True om inte har dedikerat GPU
+    model_name = "llama3.2:latest"
     base_url = "http://127.0.0.1:11434"
     user_id = get_user_id()
 
