@@ -80,7 +80,7 @@ def login():
 # pre chat
 @api.route('/setup', methods=['POST'])
 def setup():
-    user_id = "user_1" # session["user_id"]
+    user_id = "user_2" # session["user_id"]
     chat_instruction = request.form.get('chat-instruction')  # Ska komma från web interface
 
     if not user_id:
@@ -99,7 +99,7 @@ def setup():
     print(f"Uploaded File: {file.filename}")
 
     # conf
-    model_name = "llama3.1"
+    model_name = "llama3.2"
     base_url = "http://127.0.0.1:11434"
     template = ""
     complete_instruction = f"{template} {chat_instruction}"
@@ -140,7 +140,7 @@ def setup():
 # Chat Route
 @api.route('/chat', methods=['POST'])
 def chat():
-    user_id = "user_1" # request.args.get('user_id')
+    user_id = "user_2" # request.args.get('user_id')
 
     if not user_id:
         return jsonify({"error": "User not logged in"}), 401
