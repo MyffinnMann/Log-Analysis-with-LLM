@@ -1,6 +1,6 @@
 """Man ändrar GPU/CPU in denna filen"""
 
-#Längre ner i main() så ändrar du CPU/GPU rad 119
+#Längre ner i main() så ändrar du CPU/GPU rad 34
 
 
 
@@ -31,7 +31,7 @@ def setup_ollama_model(complete_instruction,
     return llm
 
 
-def setup_embeddings(use_nvidia=False, use_cpu=True):
+def setup_embeddings(use_nvidia=True, use_cpu=False): # NVIDIA: (sätt till false för amd), CPU: (sätt till True om inte har dedikerat GPU)
     """Set up embedding model; can toggle between HuggingFace and Ollama embeddings."""
     if use_nvidia and not use_cpu:
         return HuggingFaceEmbeddings(show_progress=True,
