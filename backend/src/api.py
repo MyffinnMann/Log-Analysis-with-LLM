@@ -153,12 +153,11 @@ def setup():
 @api.route('/chat', methods=['POST'])
 def chat():
     user_id = "user_2" # request.args.get('user_id')
-
+    
     if not user_id:
         return jsonify({"error": "User not logged in"}), 401
 
     data = request.get_json()
-    user_id = data.get('user_id')
     user_message = data.get('message')
 
     if not user_message:
