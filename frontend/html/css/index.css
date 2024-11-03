@@ -1,31 +1,140 @@
-/* styling for the nav part of the index page and the main part of the login page */
-body#index > nav.chat-container, body#login > main.chat-container {
-    padding: 20px;
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #e0e5ec, #c8d1df);
+    color: #333;
 }
 
-/* styling for the login buttons */
-body#index > .chat-container > ul > li {
-    list-style: none;
+.page-header {
     text-align: center;
-    padding: 1.6em;
+    padding: 1.5em;
+    background-color: #3a4750;
+    color: #fff;
+}
+.page-header h1 {
+    font-size: 2em;
+    font-weight: 500;
+    margin: 0;
 }
 
-/* styling for the login buttons */
-body#index > nav.chat-container > ul > li > a {
-    /* change text styling for the button */
-    font-size: 1.6em;
+.chat-container {
+    display: flex;
+    justify-content: center;
+    padding: 1.5em;
+}
+.chat-container ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.chat-container ul li {
+    text-align: center;
+}
+
+.chat-container .btn {
+    font-size: 1.5em;
     text-decoration: none;
     color: white;
-
-    /* change the buttons styling */
-    padding: 0.5em;
-    border-radius: 20px;
-    background-color: #333;
-    cursor: pointer;
-    transition: background-color 0.3s;
+    padding: 0.6em 1.2em;
+    border-radius: 25px;
+    background-color: #3a4750;
+    transition: background-color 0.3s, transform 0.3s;
 }
 
-/* change color when hovering with the mouse over the login buttons */
-body#index > nav.chat-container > ul > li > a:hover {
-    background-color: #222;
+.chat-container .btn:hover {
+    background-color: #28323a;
+    transform: scale(1.05);
+}
+
+.lock-container {
+    width: 70px;
+    height: 70px;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.lock {
+    background-color: #3a4750;
+    width: 30px;
+    height: 22px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -4px;
+    margin-left: -15px;
+    border-radius: 5px;
+    animation: wiggle 1.5s ease-in-out infinite;
+}
+
+.lock:before, .lock:after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    animation: close 3s ease-in-out infinite;
+}
+
+.lock:before {
+    border-top: 3px solid #3a4750;
+    border-left: 3px solid #3a4750;
+    border-right: 3px solid #3a4750;
+    border-radius: 12px 12px 0 0;
+    width: 18px;
+    height: 14px;
+    top: -22px;
+    transform-origin: center;
+}
+
+.lock:after {
+    width: 4px;
+    background-color: #3a4750;
+    height: 17px;
+    top: -12px;
+}
+
+.keyhole {
+    position: absolute;
+    width: 6px;
+    height: 9px;
+    background-color: #e0e5ec;
+    border-radius: 5px;
+    top: 7px;
+    left: 12px;
+}
+.page-footer {
+    text-align: center;
+    padding: 1em;
+    background-color: #3a4750;
+    color: #fff;
+    margin-top: auto;
+    font-size: 0.9em;
+}
+
+
+@keyframes close {
+    0%, 10% {
+        transform: translate(0%, 0%);
+    }
+    20%, 100% {
+        transform: translate(0%, 10px);
+    }
+}
+
+@keyframes wiggle {
+    0%, 20%, 100% {
+        transform: rotate(0);
+    }
+    40%, 80% {
+        transform: rotate(15deg);
+    }
+    60% {
+        transform: rotate(-15deg);
+    }
 }

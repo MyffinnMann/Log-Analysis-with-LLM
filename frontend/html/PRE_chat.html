@@ -23,6 +23,8 @@
     <div class="start-conversation">
         <button id="start-btn" disabled>Start Conversation</button>
     </div>
+    <!-- Placeholder (eller va det nu heter...) för loading message -->
+    <p id="loading-message" style="display: none; color: rgb(12, 12, 58); font-weight: bold;">Loading...</p>
 
     <footer class="page-footer">
         <p>&copy; 2024 SecureLang Logs (SLL)</p>
@@ -32,7 +34,7 @@
         const startBtn = document.getElementById('start-btn');
         const chatInstructionsInput = document.getElementById('chat-instructions');
         const logfileInput = document.getElementById('logfile');
-
+        const loadingMessage = document.getElementById('loading-message'); // Detta är för loading meddelandet 
 
         // Enable Start Conversation button if a file is selected
         logfileInput.addEventListener('change', () => {
@@ -43,6 +45,8 @@
         // Function to handle start conversation
         startBtn.addEventListener('click', async () => {
             if (logfileInput.files.length > 0) {
+                // Show loading message
+                loadingMessage.style.display = 'block';
                 const formData = new FormData();
                 formData.append('logfile', logfileInput.files[0]);
 
@@ -57,11 +61,12 @@
 
 
                 if (fileResponse.ok) {
-                    alert(fileResult.message); // Visa framgångsmeddelande för filuppladdning
+                    // alert(fileResult.message); // Här visas meddellandet att det har funkat, Kommentera ur denna raden om du vill att det ska visas. Även i api.py filen
                     // Redirect to chat page
                     window.location.href = 'chat.html'; // Redirect to chat page
                 } else {
                     alert(`File Upload Error: ${fileResult.error}`); // Display error message for file upload
+                    loadingMessage.style.display = 'none'; // Gömma meddelandet om det blir en error
                     return; // Stop execution if file upload fails
                 }
 
