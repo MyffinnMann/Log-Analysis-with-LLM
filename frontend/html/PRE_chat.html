@@ -40,8 +40,6 @@
         logfileInput.addEventListener('change', () => {
             startBtn.disabled = logfileInput.files.length === 0; // Enable if a file is selected
         });
-
-
         // Function to handle start conversation
         startBtn.addEventListener('click', async () => {
             if (logfileInput.files.length > 0) {
@@ -50,6 +48,11 @@
                 const formData = new FormData();
                 formData.append('logfile', logfileInput.files[0]);
 
+                // Lägg till chat-instruktioner i FormData
+                const instructions = chatInstructionsInput.value.trim();
+                if (instructions) {
+                    formData.append('chat-instruction', instructions); // Lägg till instruktioner
+                }
                 // Upload the log file
                 const fileResponse = await fetch('http://localhost:5000/setup', {
                     method: 'POST',
