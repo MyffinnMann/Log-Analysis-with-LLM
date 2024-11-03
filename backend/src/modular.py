@@ -115,7 +115,7 @@ def main():
     complete_instruction = f"{template} {chat_instruction}"
 
     log_file_path = Path(__file__).with_name("test.log")  # path
-    use_nvidia = False  # sätt till false för amd
+    use_nvidia = True  # sätt till false för amd
     use_cpu = False # sätt till True om inte har dedikerat GPU
     model_name = "llama3.2:latest"
     base_url = "http://127.0.0.1:11434"
