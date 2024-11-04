@@ -31,7 +31,7 @@ def setup_ollama_model(complete_instruction,
     return llm
 
 
-def setup_embeddings(use_nvidia=use_nvidia, use_cpu=use_cpu): # NVIDIA: (sätt till false för amd), CPU: (sätt till True om inte har dedikerat GPU)
+def setup_embeddings(use_nvidia, use_cpu): # NVIDIA: (sätt till false för amd), CPU: (sätt till True om inte har dedikerat GPU)
     """Set up embedding model; can toggle between HuggingFace and Ollama embeddings."""
     if use_nvidia and not use_cpu:
         return HuggingFaceEmbeddings(show_progress=True,
