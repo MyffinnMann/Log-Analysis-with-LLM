@@ -72,7 +72,7 @@ def login():
     Bo_value = DB.check_login(username, password)
     if Bo_value:
         global user_id
-        user_id = "user_1"
+        user_id = "user_2"
         user_directory = Path(f"../backend/db/{user_id}")
 
         # Store user session data
@@ -93,6 +93,7 @@ def login():
 @api.route('/setup', methods=['POST'])
 def setup():
     user_id = "user_2" # session["user_id"]
+    user_data[user_id] = {}
     chat_instruction = request.form.get('chat-instruction')  # Ska komma från web interface
 
     if not user_id:
@@ -122,7 +123,7 @@ def setup():
     # Setup embeddings
     use_nvidia = False  # Change based on the system you use
     use_cpu = True
-    embedding = setup_embeddings(use_nvidia=use_nvidia, use_cpu=use_cpu)
+    embedding = setup_embeddings(use_nvidia, use_cpu)
 
     # Förbered filen för vektorlagring
     log_file_path = Path(file.filename)
@@ -168,7 +169,7 @@ def chat():
     # vector_db = session.get('vector_db')
     ollama_instance = user_data[user_id]["ollama_instance"]
     vector_db = user_data[user_id]["vector_db"]
-    embeddings = setup_embeddings() # spelar ingen roll att denna skapas igen
+    embeddings = setup_embeddings(False, True) # param 1 = nvidia, param 2 = cpu
 
     if ollama_instance is None or vector_db is None:
         return jsonify({"error": "Model or Vector DB not initialized"}), 500
