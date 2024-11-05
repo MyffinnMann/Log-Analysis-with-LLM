@@ -105,7 +105,7 @@ def setup():
     file = request.files["logfile"]
 
     if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
+        return jsonify({"error": "No selected file"}), 400 #test
 
     # Skriv ut chat-instruktioner och filnamn
     print(f"Chat Instruction: {chat_instruction}")
