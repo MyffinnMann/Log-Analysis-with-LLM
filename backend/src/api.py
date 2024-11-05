@@ -97,7 +97,7 @@ def setup():
     chat_instruction = request.form.get('chat-instruction')  # Ska komma från web interface
 
     if not user_id:
-        return jsonify({"error": "User not logged in"}), 401 #test
+        return jsonify({"error": "User not logged in"}), 401
 
     if 'logfile' not in request.files:
         return jsonify({"error": "No file part"}), 400
