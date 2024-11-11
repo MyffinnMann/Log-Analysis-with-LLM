@@ -11,7 +11,7 @@ CORS(api)
 user_data = {}
 
 # create db
-DB_PATH = Path("/backend/db/securelang.db")
+DB_PATH = Path("backend/db/securelang.db")
 if not DB_PATH.exists():
     DB.create_tables()
     DB.insert_test_values()
@@ -122,7 +122,7 @@ def setup():
 
     # Setup embeddings
     use_nvidia = False  # Change based on the system you use
-    use_cpu = True
+    use_cpu = False
     embedding = setup_embeddings(use_nvidia, use_cpu)
 
     # Förbered filen för vektorlagring

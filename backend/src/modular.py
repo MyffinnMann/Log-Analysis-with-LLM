@@ -14,6 +14,7 @@ from langchain.chains import RetrievalQA
 from pathlib import Path
 from langchain_huggingface import HuggingFaceEmbeddings
 import torch
+import torch_directml                               #FÖR AMD SOM JAG HAR SAGT TIDIGARE
 # import torch_directml
 from datetime import datetime
 
@@ -38,7 +39,7 @@ def setup_embeddings(use_nvidia, use_cpu): # NVIDIA: (sätt till false för amd)
                                     model_kwargs={"device": "cuda"})
     if not use_nvidia and not use_cpu:
         return HuggingFaceEmbeddings(show_progress=True,
-                                    model_kwargs={"device": "cpu"})
+                                    model_kwargs={"device": torch_directml.device()})           #FÖR ATT ANVÄNDA AMD GPU SOM SAGT
     if use_cpu:
         return HuggingFaceEmbeddings(show_progress=True)
 
