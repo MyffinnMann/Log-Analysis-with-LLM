@@ -5,133 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureLang Logs (SLL)</title>
     <link rel="stylesheet" href="/css/style.css">
-<!-- ############################################################################################################### -->
-    <style>
-        * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-}
 
-body {
-    background-color: #f4f4f4;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    height: 100vh;
-    padding: 0;
-}
-
-.page-header {
-    background-color: #333;
-    color: white;
-    text-align: center;
-    width: 100%;
-    padding: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.chat-container {
-    width: 70%;
-    max-width: 1000px;
-    height: calc(100vh - 140px);
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.chat-window {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.chat-message {
-    padding: 10px 15px;
-    border-radius: 20px;
-    max-width: 75%;
-    word-wrap: break-word;
-}
-
-.bot {
-    background-color: #e5e5e5;
-    align-self: flex-start;
-    color: #333;
-}
-
-.user {
-    background-color: #333;
-    align-self: flex-end;
-    color: white;
-}
-
-.chat-input {
-    display: flex;
-    padding: 15px;
-    background-color: #f4f4f4;
-    border-top: 1px solid #ddd;
-    align-items: center;
-}
-
-#message-input {
-    flex: 1;
-    padding: 10px;
-    border-radius: 20px;
-    border: 1px solid #ddd;
-    outline: none;
-    margin-left: 10px;
-}
-
-#send-btn {
-    background-color: #333;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    margin-left: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-#send-btn:hover {
-    background-color: #222;
-}
-
-#attachment-btn {
-    background-color: #333;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 50%;
-    cursor: pointer;
-    margin-right: 10px;
-    font-size: 18px;
-    transition: background-color 0.3s;
-}
-
-#attachment-btn:hover {
-    background-color: #222;
-}
-
-.page-footer {
-    background-color: #333;
-    color: white;
-    text-align: center;
-    width: 100%;
-    padding: 10px;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-    position: relative;
-}
-
-</style>
 <!-- ############################################################################################################### -->
 </head>
 <body>
@@ -146,13 +20,12 @@ body {
                 <p>Hi, how can I assist you today?</p>
             </div>
         </div>
-
+        <div class="predefined-questions-c" id="predefined-questions">     <!---Man kan bara lägga till fler så många frågor man nu vill ha. Den skickar sedan knapp trycket som ett vanligt meddelande-->
+            <button class="question-btn">Button1</button>
+            <button class="question-btn">Button2</button>
+            <button class="question-btn">Button3</button>
+        </div>
         <div class="chat-input">
-            <!-- <form id="file-upload-form" enctype="multipart/form-data">
-                <input type="file" id="logfile" name="logfile" accept=".log">
-                <button id="attachment-btn" type="submit">📎</button>
-            </form> -->
-
             <input type="text" placeholder="Type your message..." id="message-input">
             <button id="send-btn">Send</button>
         </div>
@@ -176,6 +49,39 @@ body {
         const sendBtn = document.getElementById('send-btn');
         const messageInput = document.getElementById('message-input');
         const chatWindow = document.querySelector('.chat-window');
+        const predefinedQuestions = document.getElementById('predefined-questions');
+
+        predefinedQuestions.addEventListener('click', async (event) => {
+            if (event.target.classList.contains('question-btn')) {
+                const question = event.target.textContent;
+                
+                // Skicka frågan som ett användarmeddelande
+                const userMsgDiv = document.createElement('div');
+                userMsgDiv.classList.add('chat-message', 'user');
+                userMsgDiv.innerHTML = `<p>${question}</p>`;
+                chatWindow.appendChild(userMsgDiv);
+
+                // Fetch från API:et som vanligt
+                const response = await fetch('chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: question }),
+                    credentials: 'include',
+                });
+
+                const result = await response.json();
+
+                const botMsgDiv = document.createElement('div');
+                botMsgDiv.classList.add('chat-message', 'bot');
+                botMsgDiv.innerHTML = `<p>${response.ok ? result.response : `Error: ${result.error}`}</p>`;
+                chatWindow.appendChild(botMsgDiv);
+
+                // Rulla till botten och dölja frågeknapparna
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                predefinedQuestions.style.display = 'none';
+            }
+        });
+
 
         sendBtn.addEventListener('click', async () => {
             const userMessage = messageInput.value;
@@ -209,6 +115,7 @@ body {
 
                 messageInput.value = '';
                 chatWindow.scrollTop = chatWindow.scrollHeight;
+                predefinedQuestions.style.display = 'none';
             }
         });
     </script>

@@ -80,6 +80,32 @@ body {
     outline: none;
     margin-left: 10px;
 }
+#predefined-questions-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;  /* Centrerar knapparna horisontellt */
+    gap: 5px;  /* Minskar mellanrummet mellan knapparna */
+    flex-wrap: wrap;  /* Gör så att knapparna bryts till nästa rad om de inte får plats */
+    padding: 10px 0;  /* Lite padding ovanför och nedanför knapparna */
+    margin-top: 0;  /* Ser till att knapparna är nära inputfältet */
+}
+
+.question-btn {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 8px 16px;  /* Minskar padding för att göra knapparna mer tighta */
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 0;  /* Tar bort extra mellanrum runt knapparna */
+}
+
+.question-btn:hover {
+    background-color: #555;
+}
+
+
 
 #send-btn {
     background-color: #333;
