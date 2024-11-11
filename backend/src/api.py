@@ -3,6 +3,7 @@ from flask_cors import CORS
 import DB
 from modular import *
 from datetime import timedelta
+import os
 
 # flask application startup
 api = Flask(__name__)
@@ -92,6 +93,10 @@ def login():
 # pre chat
 @api.route('/setup', methods=['POST'])
 def setup():
+    #DEBUG_________
+    print("Current working directory:", os.getcwd())
+
+
     user_id = "user_2" # session["user_id"]
     user_data[user_id] = {}
     chat_instruction = request.form.get('chat-instruction')  # Ska komma från web interface
@@ -131,7 +136,8 @@ def setup():
     data = load_document(log_file_path)
     chunks = split_documents(data)
 
-    user_directory = Path(f"../backend/db/{user_id}") # Path(session["user_directory"])
+    user_directory = Path(f"backend/db/{user_id}") # Path(session["user_directory"])    FUNKAR I VSC OCH MAN KÖR TERMINAL I FOLDER UTANFÖR BACKEND ETT STEG 
+    #user_directory = Path(f"../backend/db/{user_id}")                                  DETTA ÄR DEN GAMLA
     # if user_directory.exists():
     #     vector_db = load_vector_db(user_id, user_directory, collection_name="local", embeddings=embedding)
     # else:
@@ -197,4 +203,6 @@ def chat():
         return jsonify({"response": answer}), 200
 
 if __name__ == '__main__':
+    print("Current working directory:", os.getcwd())
     api.run(host='0.0.0.0', port=5000, debug=True)
+    print("Current working directory:", os.getcwd())
