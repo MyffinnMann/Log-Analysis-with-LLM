@@ -3,7 +3,6 @@ from flask_cors import CORS
 import DB
 from modular import *
 from datetime import timedelta
-import os
 
 # flask application startup
 api = Flask(__name__)
@@ -93,9 +92,6 @@ def login():
 # pre chat
 @api.route('/setup', methods=['POST'])
 def setup():
-    #DEBUG_________
-    print("Current working directory:", os.getcwd())
-
 
     user_id = "user_2" # session["user_id"]
     user_data[user_id] = {}
@@ -203,6 +199,4 @@ def chat():
         return jsonify({"response": answer}), 200
 
 if __name__ == '__main__':
-    print("Current working directory:", os.getcwd())
     api.run(host='0.0.0.0', port=5000, debug=True)
-    print("Current working directory:", os.getcwd())
