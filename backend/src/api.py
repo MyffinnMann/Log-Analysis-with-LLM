@@ -92,6 +92,7 @@ def login():
 # pre chat
 @api.route('/setup', methods=['POST'])
 def setup():
+
     user_id = "user_2" # session["user_id"]
     user_data[user_id] = {}
     chat_instruction = request.form.get('chat-instruction')  # Ska komma från web interface
@@ -131,7 +132,8 @@ def setup():
     data = load_document(log_file_path)
     chunks = split_documents(data)
 
-    user_directory = Path(f"../backend/db/{user_id}") # Path(session["user_directory"])
+    user_directory = Path(f"backend/db/{user_id}") # Path(session["user_directory"])    FUNKAR I VSC OCH MAN KÖR TERMINAL I FOLDER UTANFÖR BACKEND ETT STEG 
+    #user_directory = Path(f"../backend/db/{user_id}")                                  DETTA ÄR DEN GAMLA
     # if user_directory.exists():
     #     vector_db = load_vector_db(user_id, user_directory, collection_name="local", embeddings=embedding)
     # else:
