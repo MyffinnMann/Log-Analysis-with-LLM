@@ -3,6 +3,7 @@ from flask_cors import CORS
 import DB
 from modular import *
 from datetime import timedelta
+import os
 
 # flask application startup
 api = Flask(__name__)
@@ -12,7 +13,7 @@ user_data = {}
 
 # create db
 DB_PATH = Path("backend/db/securelang.db")
-if not DB_PATH.exists():
+if("securelang.db" not in os.listdir("backend/db")):
     DB.create_tables()
     DB.insert_test_values()
 
