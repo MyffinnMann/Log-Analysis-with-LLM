@@ -104,7 +104,15 @@
                 if (response.ok) {
                     const botMsgDiv = document.createElement('div');
                     botMsgDiv.classList.add('chat-message', 'bot');
-                    botMsgDiv.innerHTML = `<p>${result.response}</p>`;
+                    
+                    const answerArr = result.response.split("\n");
+                    let multiLineAnswer = "";
+                    
+                    for (let i of answerArr){
+                        multiLineAnswer += `<p>${i}</p>`;
+                    }
+
+                    botMsgDiv.innerHTML = multiLineAnswer//`<p>${result.response}</p>`;
                     chatWindow.appendChild(botMsgDiv);
                 } else {
                     const botMsgDiv = document.createElement('div');

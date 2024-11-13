@@ -124,7 +124,7 @@ def setup():
 
     # Setup embeddings
     use_nvidia = False  # Change based on the system you use
-    use_cpu = False
+    use_cpu = True
     embedding = setup_embeddings(use_nvidia, use_cpu)
 
     # Förbered filen för vektorlagring

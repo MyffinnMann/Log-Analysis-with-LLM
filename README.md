@@ -21,8 +21,13 @@ Ollama with llama3.2
 
 To install the required dependencies, run the following commands:
 ```bash
+pip install flask
+pip install flask_cors
 pip install langchain
 pip install langchain-community
+pip install langchain_ollama
+pip install langchain_chroma
+pip install langchain_huggingface
 pip install torch
 pip install torch-directml
 pip install chromadb
