@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureLang Logs (SLL)</title>
     <link rel="stylesheet" href="/css/style.css">
-
-<!-- ############################################################################################################### -->
 </head>
 <body>
     <header class="page-header">
         <h2>SecureLang Logs (SLL)</h2>
+        <button class="button logout">Log out</button>
     </header>
 
 
@@ -26,8 +25,8 @@
             <button class="question-btn">Button3</button>
         </div>
         <div class="chat-input">
-            <input type="text" placeholder="Type your message..." id="message-input">
-            <button id="send-btn">Send</button>
+            <input type="text" placeholder="Type your message..." id="message-input" class="msg-input">
+            <button id="send-btn" class="button">Send</button>
         </div>
     </div>
 
@@ -36,15 +35,6 @@
     </footer>
 
     <script>
-        // Check if the token exists, otherwise redirect to login
-        function checkAuth() {
-            if (!document.cookie.includes('token')) {
-                window.location.href = '/login.html';  // Redirect to login page
-            }
-        }
-        // Run check on page load
-        // window.onload = checkAuth; // this will check for token before page loads.
-
         // Add chat functionality (similar to the original one)
         const sendBtn = document.getElementById('send-btn');
         const messageInput = document.getElementById('message-input');
@@ -125,6 +115,26 @@
                 chatWindow.scrollTop = chatWindow.scrollHeight;
                 predefinedQuestions.style.display = 'none';
             }
+        });
+
+        // log out
+        document.querySelector('.logout').addEventListener('click', async function() {
+        try {
+            const response = await fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                window.location.href = '/';
+            }
+        } catch (error) {
+            console.error('Error during logout:', error);
+        }
         });
     </script>
 </body>
