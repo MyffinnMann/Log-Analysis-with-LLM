@@ -6,8 +6,10 @@ from langchain.chains import RetrievalQA
 from pathlib import Path
 from langchain_huggingface import HuggingFaceEmbeddings
 import torch
-#import torch_directml
 from datetime import datetime
+
+# Uncomment the following line and line 39-41 if using AMD
+#import torch_directml
 
 def get_user_id():
     """Used for testing of llm should not be used in api"""
