@@ -3,7 +3,6 @@ from flask_cors import CORS
 import DB
 from modular import *
 from datetime import timedelta
-import os
 
 # flask application startup
 api = Flask(__name__)

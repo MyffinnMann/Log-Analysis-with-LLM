@@ -26,9 +26,9 @@ def check_login(username, pas):
     sql_query = """SELECT Hash_PWD FROM Password
                     WHERE user_ID = (SELECT ID FROM user WHERE Username = ?)"""
     try:
-        cursor.execute(sql_query, (username,))  
+        cursor.execute(sql_query, (username,))
         stored_pas = cursor.fetchone()
-        Bo_value = verify_pas(stored_pas[0], pas)  
+        Bo_value = verify_pas(stored_pas[0], pas)
     except:
         return False
     return Bo_value
@@ -37,13 +37,13 @@ def create_tables():
     try:
         conn = connect()
         conn.execute('''
-        CREATE TABLE user ( 
+        CREATE TABLE user (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
             Username TEXT NOT NULL
         );
         ''')
         conn.execute('''
-        CREATE TABLE Password ( 
+        CREATE TABLE Password (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
             Hash_PWD TEXT NOT NULL,
             user_ID INTEGER,
@@ -61,7 +61,7 @@ def create_tables():
 def insert_test_values():
     try:
         conn = connect()
-        
+
         hash = ph.hash("test")
         conn.execute('''
         INSERT INTO user (Username) VALUES ('test_user');
@@ -69,7 +69,7 @@ def insert_test_values():
         conn.execute('''
         INSERT INTO Password (Hash_PWD, user_ID) VALUES (?, 1);
         ''', (hash,))
-                     
+
         conn.commit()
         print("Test values inserted successfully") 
 
