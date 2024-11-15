@@ -138,3 +138,10 @@ body {
         transform: rotate(-15deg);
     }
 }
+
+
+.prechat-container * {
+    margin: 10px !important;
+
+}
+

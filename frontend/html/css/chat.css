@@ -72,14 +72,16 @@ body {
     align-items: center;
 }
 
-#message-input {
+.msg-input {
     flex: 1;
     padding: 10px;
     border-radius: 20px;
     border: 1px solid #ddd;
     outline: none;
     margin-left: 10px;
+    margin-right: 10px;
 }
+
 #predefined-questions-container {
     width: 100%;
     display: flex;
@@ -105,21 +107,28 @@ body {
     background-color: #555;
 }
 
-
-
-#send-btn {
+.button {
     background-color: #333;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 8px 16px;  /* Minskar padding för att göra knapparna mer tighta */
     border-radius: 20px;
-    margin-left: 10px;
     cursor: pointer;
     transition: background-color 0.3s;
+    margin: 0;  /* Tar bort extra mellanrum runt knapparna */
 }
 
-#send-btn:hover {
-    background-color: #222;
+.button:hover {
+    background-color: #555;
+}
+
+.button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.button:hover:enabled {
+    background-color: #333333;
 }
 
 #attachment-btn {
@@ -146,4 +155,10 @@ body {
     padding: 10px;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
     position: relative;
+}
+
+
+.logout {
+    margin-top: 5px;
+    border: 2px solid white;
 }
