@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify, send_from_directory, url_for, redirect, session
 from flask_cors import CORS
 import DB
-from modular import *
 from datetime import timedelta
 import os
+
+from modular import *
+from config import *
 
 # flask application startup
 api = Flask(__name__)
@@ -113,18 +115,11 @@ def setup():
     print(f"Chat Instruction: {chat_instruction}")
     print(f"Uploaded File: {file.filename}")
 
-    # conf
-    model_name = "llama3.2"
-    base_url = "http://127.0.0.1:11434"
-    template = ""
-    complete_instruction = f"{template} {chat_instruction}"
 
     # Setup Ollama model
-    ollama_instance = setup_ollama_model(complete_instruction, base_url=base_url, model=model_name)
+    ollama_instance = setup_ollama_model(f"{template} {chat_instruction}", base_url=base_url, model=model_name)
 
     # Setup embeddings
-    use_nvidia = False  # Change based on the system you use
-    use_cpu = True
     embedding = setup_embeddings(use_nvidia, use_cpu)
 
     # Förbered filen för vektorlagring
