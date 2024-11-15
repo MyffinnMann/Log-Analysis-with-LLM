@@ -198,5 +198,11 @@ def chat():
 
         return jsonify({"response": answer}), 200
 
+
+@api.route('/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return jsonify({"success": True}), 200
+
 if __name__ == '__main__':
     api.run(host='0.0.0.0', port=5000, debug=True)

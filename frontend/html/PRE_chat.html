@@ -5,104 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureLang Logs (SLL)</title>
     <link rel="stylesheet" href="css/style.css">
-    <!-- /////////////////////////////////////////////////////////////////////////// -->
-    <style>
-        /* General Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-}
-
-/* Centering Content */
-body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background-color: #f4f7f9;
-}
-
-/* Container to hold elements */
-.container {
-    text-align: center;
-    max-width: 500px;
-    width: 100%;
-    padding: 20px;
-    background-color: #ffffff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-}
-
-/* Text Input Styling */
-#chat-instructions {
-    width: 100%;
-    height: 100px;
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    resize: vertical;
-    margin-bottom: 15px;
-}
-
-/* File Upload Styling */
-.upload-container input[type="file"] {
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 15px;
-}
-
-/* Button Styling */
-#start-btn {
-    width: 100%;
-    padding: 15px;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #ffffff;
-    background-color: #333333;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#start-btn:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
-
-#start-btn:hover:enabled {
-    background-color: #333333;
-}
-
-    </style>
-    <!-- ///////////////////////////////////////////////////////////////////////////// -->
 </head>
 <body>
     <header class="page-header">
         <h2>SecureLang Logs (SLL)</h2>
+        <button class="button logout">Log out</button>
     </header>
 
-    <div class="instructions">
-        <h3>Chat Instructions</h3>
-        <textarea id="chat-instructions" placeholder="Write your chat instructions here..."></textarea>
-    </div>
+    <div class="prechat-container">
+        <div class="instructions">
+            <h3>Chat Instructions</h3>
+            <textarea id="chat-instructions" placeholder="Write your chat instructions here..." class="msg-input"></textarea>
+        </div>
 
-    <div class="upload-container">
-        <input type="file" id="logfile" name="logfile" accept=".log" required>
-    </div>
+        <div class="upload-container">
+            <input type="file" id="logfile" name="logfile" accept=".log" required style="display: none;">
+            <label for="logfile" class="button">Upload file</label>
+        </div>
 
-    <div class="start-conversation">
-        <button id="start-btn" disabled>Start Conversation</button>
+        <div class="start-conversation">
+            <button id="start-btn" disabled class="button">Start Conversation</button>
+        </div>
+        <!-- Placeholder (eller va det nu heter...) för loading message -->
+        <p id="loading-message" style="display: none; color: rgb(12, 12, 58); font-weight: bold;">Loading...</p>
     </div>
-    <!-- Placeholder (eller va det nu heter...) för loading message -->
-    <p id="loading-message" style="display: none; color: rgb(12, 12, 58); font-weight: bold;">Loading...</p>
 
     <footer class="page-footer">
         <p>&copy; 2024 SecureLang Logs (SLL)</p>
@@ -174,6 +100,26 @@ body {
             } else {
                 //alert('Please select a log file before starting the conversation.');
             }
+        });
+
+        // log out
+        document.querySelector('.logout').addEventListener('click', async function() {
+        try {
+            const response = await fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                window.location.href = '/';
+            }
+        } catch (error) {
+            console.error('Error during logout:', error);
+        }
         });
     </script>
 </body>
