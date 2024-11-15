@@ -75,11 +75,13 @@
 
         sendBtn.addEventListener('click', async () => {
             const userMessage = messageInput.value;
+            messageInput.value = '';
             if (userMessage.trim()) {
                 const userMsgDiv = document.createElement('div');
                 userMsgDiv.classList.add('chat-message', 'user');
                 userMsgDiv.innerHTML = `<p>${userMessage}</p>`;
                 chatWindow.appendChild(userMsgDiv);
+                messageInput.disabled = true;
 
 
                 const response = await fetch('chat', {
@@ -111,7 +113,7 @@
                     chatWindow.appendChild(botMsgDiv);
                 }
 
-                messageInput.value = '';
+                messageInput.disabled = false
                 chatWindow.scrollTop = chatWindow.scrollHeight;
                 predefinedQuestions.style.display = 'none';
             }

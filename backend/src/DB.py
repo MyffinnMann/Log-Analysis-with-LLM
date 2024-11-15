@@ -39,7 +39,7 @@ def create_tables():
         conn.execute('''
         CREATE TABLE user (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            Username TEXT NOT NULL
+            Username TEXT NOT NULL UNIQUE
         );
         ''')
         conn.execute('''
@@ -58,23 +58,29 @@ def create_tables():
     finally:
         conn.close()
 
-def insert_test_values():
+def insert_test_values(username, password):
     try:
         conn = connect()
 
-        hash = ph.hash("test")
-        conn.execute('''
-        INSERT INTO user (Username) VALUES ('test_user');
-        ''')
-        conn.execute('''
-        INSERT INTO Password (Hash_PWD, user_ID) VALUES (?, 1);
-        ''', (hash,))
+        # kolla om användar namn redan finns
+        result = conn.execute('SELECT ID FROM user WHERE Username = ?', (username,))
+        if result.fetchone() is not None:
+            print(f"Username '{username}' already exists.")
+            return
+
+        # Insert the username
+        conn.execute('INSERT INTO user (Username) VALUES (?);', (username,))
+        user_id = conn.execute('SELECT last_insert_rowid();').fetchone()[0]  # user_id av sista insertad användar namn
+
+        # Hash lösenordet och insert
+        hash = ph.hash(password)
+        conn.execute('INSERT INTO Password (Hash_PWD, user_ID) VALUES (?, ?);', (hash, user_id))
 
         conn.commit()
-        print("Test values inserted successfully") 
+        print(f"User '{username}' inserted successfully.")
 
-    except:
-        print("Test values already exists or error inserting test values")
+    except Exception as e:
+        print(f"Error inserting user '{username}': {e}")
     finally:
         conn.close()
 

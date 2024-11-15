@@ -17,7 +17,9 @@ user_data = {}
 DB_PATH = Path("backend/db/securelang.db")
 if("securelang.db" not in os.listdir("backend/db")):
     DB.create_tables()
-    DB.insert_test_values()
+    DB.insert_test_values("test_user", "test")
+    DB.insert_test_values("user_1", "user_1")
+    DB.insert_test_values("user_2", "user_2")
 
 api.secret_key = "hello"
 api.permanent_session_lifetime = timedelta(minutes=60)
@@ -75,7 +77,7 @@ def login():
     Bo_value = DB.check_login(username, password)
     if Bo_value:
         global user_id
-        user_id = "user_2"
+        user_id = username
         user_directory = Path(f"../backend/db/{user_id}")
 
         # Store user session data
@@ -83,10 +85,6 @@ def login():
         session['user_directory'] = str(user_directory)
         session['vector_db'] = None
         session['ollama_instance'] = None
-
-        print("\ndebuggggg\n")
-        print(session)
-        print("\ndebuggggg\n")
 
         return jsonify({"success": True, "user_id": user_id}), 200
     else:
@@ -96,7 +94,7 @@ def login():
 @api.route('/setup', methods=['POST'])
 def setup():
 
-    user_id = "user_2" # session["user_id"]
+    # user_id = "user_2" # session["user_id"]
     user_data[user_id] = {}
     chat_instruction = request.form.get('chat-instruction')  # Ska komma från web interface
 
@@ -151,7 +149,7 @@ def setup():
 # Chat Route
 @api.route('/chat', methods=['POST'])
 def chat():
-    user_id = "user_2" # request.args.get('user_id')
+    user_id = session["user_id"] # request.args.get('user_id')
     
     if not user_id:
         return jsonify({"error": "User not logged in"}), 401
@@ -183,11 +181,11 @@ def chat():
 
         # get response
         response = qachain({"query": user_message})
-        print("DEBUGGGG Chat response:", response)
+        # print("DEBUGGGG Chat response:", response) # DEBUGG
 
         # get answer
         answer = response['result']
-        # print(f"Answer: {answer}")
+        # print(f"Answer: {answer}")  # DEBUGG
 
         # Store the interaction in the vector DB
         persistent_storage(user_message, answer, user_id, embeddings, vector_db)
