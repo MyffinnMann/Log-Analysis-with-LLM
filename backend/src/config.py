@@ -1,3 +1,4 @@
+"""Config file (LLM, hardware etc.)"""
 # Configure hardware or software acceleration for embedding (NVIDIA, AMD, CPU)
 # - For NVIDIA use: "use_nvidia = True" and "use_cpu = False"
 # - For AMD use: "use_nvidia = False" and "use_cpu = False"
