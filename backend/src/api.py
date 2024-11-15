@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, send_from_directory, url_for, redirec
 from flask_cors import CORS
 import DB
 from datetime import timedelta
-import os
 
 from modular import *
 from config import *
