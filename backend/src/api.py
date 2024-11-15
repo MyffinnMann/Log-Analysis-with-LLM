@@ -1,3 +1,4 @@
+"""File to connect backend with frontend"""
 from flask import Flask, request, jsonify, send_from_directory, url_for, redirect, session
 from flask_cors import CORS
 import DB
