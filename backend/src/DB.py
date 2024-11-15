@@ -1,4 +1,4 @@
-
+"""This is the file for the user-credential database (sqlite)"""
 import sqlite3
 from argon2 import PasswordHasher
 ph = PasswordHasher()
