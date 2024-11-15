@@ -1,3 +1,4 @@
+"""LLM backend"""
 from langchain_ollama import OllamaLLM
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
