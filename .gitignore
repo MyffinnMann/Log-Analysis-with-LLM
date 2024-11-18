@@ -7,4 +7,5 @@ Proxifier.log
 test.log
 SSH.log
 testtext.log
-backend/db/
+backend/db/vector_db/
+backend/db/user_db/
