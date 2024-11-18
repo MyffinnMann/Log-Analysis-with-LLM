@@ -104,7 +104,7 @@ def insert_test_values(username, password):
         print(f"Error inserting user '{username}': {e}")
     finally:
         conn.close()
-    
+
 
 ## funktion för att mapa en session id till en användare
 def map_session_id_to_user(session_id):
@@ -139,4 +139,3 @@ def remove_session_id(session_phrase):
         print("Error removing session id")
     finally:
         conn.close()
-        

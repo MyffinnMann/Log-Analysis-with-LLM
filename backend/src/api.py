@@ -78,13 +78,11 @@ def login():
     if Bo_value:
         global user_id
         user_id = username
-        user_directory = Path(f"../backend/db/{user_id}")
+        user_directory = Path(f"../backend/db/user_db/{user_id}")
 
         # Store user session data
         session["user_id"] = user_id
         session['user_directory'] = str(user_directory)
-        session['vector_db'] = None
-        session['ollama_instance'] = None
 
         return jsonify({"success": True, "user_id": user_id}), 200
     else:
@@ -96,7 +94,7 @@ def setup():
 
     # user_id = "user_2" # session["user_id"]
     user_data[user_id] = {}
-    chat_instruction = request.form.get('chat-instruction')  # Ska komma från web interface
+    chat_instruction = request.form.get('chat-instruction')
 
     if not user_id:
         return jsonify({"error": "User not logged in"}), 401
@@ -126,7 +124,7 @@ def setup():
     data = load_document(log_file_path)
     chunks = split_documents(data)
 
-    user_directory = Path(f"backend/db/{user_id}") # Path(session["user_directory"])    FUNKAR I VSC OCH MAN KÖR TERMINAL I FOLDER UTANFÖR BACKEND ETT STEG 
+    user_directory = Path(f"backend/db/user_db/{user_id}") # Path(session["user_directory"])    FUNKAR I VSC OCH MAN KÖR TERMINAL I FOLDER UTANFÖR BACKEND ETT STEG 
     #user_directory = Path(f"../backend/db/{user_id}")                                  DETTA ÄR DEN GAMLA
     # if user_directory.exists():
     #     vector_db = load_vector_db(user_id, user_directory, collection_name="local", embeddings=embedding)
@@ -150,7 +148,7 @@ def setup():
 @api.route('/chat', methods=['POST'])
 def chat():
     user_id = session["user_id"] # request.args.get('user_id')
-    
+
     if not user_id:
         return jsonify({"error": "User not logged in"}), 401
 
