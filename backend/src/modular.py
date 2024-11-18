@@ -135,7 +135,7 @@ def remove_user_data(vector_db):
 
 def sanitize_input(user_input):
     """sanitize and filter user input"""
-    sanitized = re.sub(r"[^a-zA-Z0-9\s\?\!\.-\w+$\w,]", "", user_input).strip()
+    sanitized = re.sub(r"[^\w\s\?\!.,-]", "", user_input).strip()
     for keyword in keywords:
         if keyword.lower() in sanitized.lower():
             logging.warning(f"keyword in input: {keyword}")
@@ -223,10 +223,10 @@ def main():
             response = qachain.invoke({"query": formatted_prompt})
 
             answer = response['result']
-            filtered_answer = filter_answer(answer)
+            filtered_answer= filter_answer(answer)
             print(f"Answer: {filtered_answer}")
 
-            conversation_history.append((question, filter_answer))
+            conversation_history.append((question, filtered_answer))
             persistent_storage(question, answer, user_id, embeddings, vector_db)
 
         except Exception as e:
