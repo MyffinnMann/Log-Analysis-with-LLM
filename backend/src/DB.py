@@ -28,7 +28,7 @@ def check_login(username, pas):
     cursor = db.cursor()
     sql_query = """SELECT Hash_PWD FROM Password
                     WHERE user_ID = (SELECT ID FROM user WHERE Username = ?)"""
-    sql_query2 = """INSERT INTO Session (Session_ID, user_ID) VALUES (?, (SELECT ID FROM user WHERE Username = ?))"""
+    sql_query2 = """INSERT INTO Session (Session_ID, username) VALUES (?, ?);"""
     try:
         cursor.execute(sql_query, (username,))
         stored_pas = cursor.fetchone()
@@ -39,8 +39,9 @@ def check_login(username, pas):
                 session_id = generate_session_id()
                 cursor.execute(sql_query2, (session_id, username))
                 db.commit()
-            except:
-                print("Error inserting session id")
+            except sqlite3.Error as error:
+                print("Error creating session id:", error)
+                
     except:
         return False
     return Bo_value
@@ -62,20 +63,19 @@ def create_tables():
             FOREIGN KEY(user_ID) REFERENCES user(ID)
         );
         ''')
-        ## skapade en till tabell för att randomiza session id
+        ## skapade en till tabell för att randomiza session id med användarenamn
         conn.execute('''
         CREATE TABLE Session (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            Session_ID TEXT NOT NULL,
-            user_ID INTEGER,
-            FOREIGN KEY(user_ID) REFERENCES user(ID)
+            Session_ID TEXT NOT NULL UNIQUE,
+            username TEXT NOT NULL,
+            FOREIGN KEY(username) REFERENCES user(Username)
         );
         ''')
 
         conn.commit()
         print("User table created successfully")
-    except:
-        print("User table already exists")
+    except sqlite3.OperationalError as e:
+        print("Error creating user table:", e)
     finally:
         conn.close()
 
@@ -106,24 +106,42 @@ def insert_test_values(username, password):
         conn.close()
 
 
-## funktion för att mapa en session id till en användare
+## funktion för att mapa en session id till en användare, detta används när man vill ha tilbbaka användarnamnet
 def map_session_id_to_user(session_id):
     try:
         conn = connect()
         cursor = conn.cursor()
         cursor.execute('''
-        SELECT user_ID FROM Session WHERE Session_ID = ?;
+        SELECT username FROM Session WHERE Session_ID = ?;
         ''', (session_id,))
-        user_id = cursor.fetchone()
-        return user_id[0]
-    except:
-        print("Error mapping session id to user")
+        username = cursor.fetchone()
+        return username[0]
+    except sqlite3.Error as e:
+        print("Error mapping session id to user:", e)
+        return None
     finally:
         conn.close()
 
-## funktion för att skapa 16 tecken+siffror lång session id
+## funktion för att mapa användare till session id, detta används när man vill ha tillbaka session id
+def map_user_to_session_id(username):
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute('''
+        SELECT Session_ID FROM Session WHERE username = ?;
+        ''', (username,))
+        session_id = cursor.fetchone()
+        return session_id[0]
+    except sqlite3.Error as e:
+        print("Error mapping user to session id:", e)
+        return None
+    finally:
+        conn.close
+
+
+## funktion för att skapa 32 tecken+siffror lång session id
 def generate_session_id():
-    session_id = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+    session_id = ''.join(random.choices(string.ascii_letters + string.digits, k=32))
     return session_id
 
 ## ta bort session id från databasen
@@ -139,3 +157,5 @@ def remove_session_id(session_phrase):
         print("Error removing session id")
     finally:
         conn.close()
+
+## funktion för att ta bort användarens namn 
