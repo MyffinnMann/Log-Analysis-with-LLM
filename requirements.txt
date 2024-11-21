@@ -1,0 +1,14 @@
+flask==2.3.2
+flask-cors==3.0.10
+langchain==0.0.281
+langchain-community==0.0.8
+langchain-ollama==0.0.4
+langchain-chroma==0.0.7
+langchain-huggingface==0.0.5
+torch==2.0.1
+torch-directml==1.13.0
+torchvision==0.15.2
+torchaudio==2.0.2
+chromadb==0.4.11
+huggingface-hub==0.18.0
+argon2-cffi==21.3.0
