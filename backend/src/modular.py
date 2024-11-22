@@ -139,7 +139,7 @@ def sanitize_input(user_input):
     for keyword in keywords:
         if keyword.lower() in sanitized.lower():
             logging.warning(f"keyword in input: {keyword}")
-            raise ValueError("input contains restricted information.")
+            return "input contains restricted information."
     return sanitized
 
 def filter_answer(answer):
