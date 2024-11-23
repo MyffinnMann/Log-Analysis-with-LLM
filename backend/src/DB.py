@@ -3,6 +3,7 @@ import sqlite3
 from argon2 import PasswordHasher
 import random
 import string
+from modular import logging
 
 ph = PasswordHasher()
 
@@ -20,7 +21,8 @@ def hash_pas(passwor):
 def verify_pas(stored_pas, given_pas):
     try:
         return ph.verify(stored_pas, given_pas)
-    except:
+    except Exception as e:
+        logging.error("Error: Could not verify password", e)
         return False
 
 def check_login(username, pas):
@@ -41,8 +43,9 @@ def check_login(username, pas):
                 db.commit()
             except sqlite3.Error as error:
                 print("Error creating session id:", error)
-                
-    except:
+
+    except Exception as e:
+        logging.error("Error: Could not create session", e)
         return False
     return Bo_value
 
@@ -153,9 +156,8 @@ def remove_session_id(session_phrase):
         DELETE FROM Session WHERE session_ID = ?;
         ''', (session_phrase,))
         conn.commit()
-    except:
-        print("Error removing session id")
+    except Exception as e:
+        logging.error("Error: Removing session id", e)
     finally:
         conn.close()
-
-## funktion för att ta bort användarens namn 
+## funktion för att ta bort användarens namn

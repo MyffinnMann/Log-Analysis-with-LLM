@@ -1,11 +1,35 @@
 """File to connect backend with frontend"""
-from flask import Flask, request, jsonify, send_from_directory, url_for, redirect, session
+from flask import(
+    Flask,
+    request,
+    jsonify,
+    send_from_directory,
+    session,
+)
 from flask_cors import CORS
 import DB
 from datetime import timedelta
-
-from modular import *
-from config import *
+from modular import(
+    setup_embeddings,
+    persistent_storage,
+    logging, Path,
+    os,
+    setup_ollama_model,
+    load_document,
+    load_vector_db,
+    split_documents,
+    setup_vector_db,
+    sanitize_input,
+    setup_qa_chain,
+    filter_answer,
+)
+from config import(
+    template,
+    base_url,
+    model_name,
+    use_cpu,
+    use_nvidia,
+)
 
 # flask application startup
 api = Flask(__name__)
@@ -93,8 +117,6 @@ def login():
 # pre chat
 @api.route('/setup', methods=['POST'])
 def setup():
-
-    # user_id = "user_2" # session["user_id"]
     user_data[user_id] = {}
     chat_instruction = request.form.get('chat-instruction')
 
@@ -107,12 +129,7 @@ def setup():
     file = request.files["logfile"]
 
     if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400 #test
-
-    # Skriv ut chat-instruktioner och filnamn
-    print(f"Chat Instruction: {chat_instruction}")
-    print(f"Uploaded File: {file.filename}")
-
+        return jsonify({"error": "No selected file"}), 400 #test #vad är detta för test? /oscar
 
     # Setup Ollama model
     ollama_instance = setup_ollama_model(f"{template} {chat_instruction}", base_url=base_url, model=model_name)
@@ -127,21 +144,12 @@ def setup():
     chunks = split_documents(data)
 
     user_directory = Path(f"backend/db/vector_db/{user_id}") # Path(session["user_directory"])    FUNKAR I VSC OCH MAN KÖR TERMINAL I FOLDER UTANFÖR BACKEND ETT STEG 
-    #user_directory = Path(f"../backend/db/{user_id}")                                  DETTA ÄR DEN GAMLA
-    # if user_directory.exists():
-    #     vector_db = load_vector_db(user_id, user_directory, collection_name="local", embeddings=embedding)
-    # else:
     if user_directory.exists():
         vector_db = load_vector_db(user_id=user_id, embeddings=embedding)
     else:
         vector_db = setup_vector_db(chunks, embedding, persist_directory=user_directory)
 
-
-    # update user_sessions per user
-    # session['ollama_instance'] = ollama_instance
-    # session['vector_db'] = vector_db
-
-    # TEMPORARY SOLUTION UNTIL SESSION WORKS. REMOVE THIS AND UNCOMMENT SESSION[##] LINES AFTER SESSION IS FIXED
+    # vi kör på detta
     user_data[user_id] = {
         'user_directory': user_directory,
         'vector_db': vector_db,
@@ -149,27 +157,22 @@ def setup():
         "chat-instruction": chat_instruction # behöver ha denna senare sätter den här
     }
     return jsonify({"Success": True}), 200 # kod 200 att det lyckades
-    #return jsonify({"success": True, "message": "Setup completed successfully"}), 200 # Kommentera även ut denna raden om du vill att meddelandet ska visas och godkännas när det lyckas
 
 # Chat Route
 @api.route('/chat', methods=['POST'])
 def chat():
-    user_id = session["user_id"] # request.args.get('user_id')
+    user_id = session["user_id"]
 
     if not user_id:
         return jsonify({"error": "User not logged in"}), 401
 
     data = request.get_json()
-    user_message = data.get('message')
-    print(user_message)
-    user_message = sanitize_input(user_message)
+    question = sanitize_input(data.get('message'))
 
-    if not user_message:
+    if not question:
         return jsonify({"error": "No message provided"}), 400
 
-    # Retrieve the model and vector DB from the session
-    # ollama_instance = session.get('ollama_instance')
-    # vector_db = session.get('vector_db')
+    # ta fram information vi har från setup
     ollama_instance = user_data[user_id]["ollama_instance"]
     vector_db = user_data[user_id]["vector_db"]
     embeddings = setup_embeddings(False, True) # param 1 = nvidia, param 2 = cpu
@@ -179,44 +182,38 @@ def chat():
 
     # Set up QA chain
     qachain = setup_qa_chain(ollama_instance, vector_db)
-    conversation_history = []
-    last_call_time = time.time()
+    conversation_history = user_data[user_id].get("conversation-history", [])
     chat_instruction = user_data[user_id]["chat-instruction"]
 
     # conversation loop
-    while True:
-        # question = input("Ask a question (or type 'exit' to quit):\n")
-        # if question.lower() == 'exit':
-        #     break
-        try:
-            relevant_docs = qachain.retriever.get_relevant_documents(user_message)
-            retrieved_context = "\n".join(doc.page_content for doc in relevant_docs)
-            history_context = "\n".join([f"Q: {q}\nA: {a}" for q, a in conversation_history])
-            full_context = f"{history_context}\n{retrieved_context}"
+    try:
+        relevant_docs = qachain.retriever.get_relevant_documents(question)
+        retrieved_context = "\n".join(doc.page_content for doc in relevant_docs)
 
-            formatted_prompt = template.format(chat_instruction=chat_instruction, context=full_context, query=user_message)
-            # get response
-            response = qachain({"query": formatted_prompt})
-            last_call_time = rate_limit(last_call_time)
-            # print("DEBUGGGG Chat response:", response) # DEBUGG
+        history_context = "\n".join([f"Q: {q}\nA: {a}" for q, a in conversation_history[-3:]])
+        full_context = f"{history_context}\n{retrieved_context}"
 
-            # get answer
-            answer = response['result']
-            filtered_answer = filter_answer(answer)
+        formatted_prompt = template.format(chat_instruction=chat_instruction, context=full_context, query=question)
 
-            # print(f"Answer: {answer}")  # DEBUGG
+        # get response
+        response = qachain({"query": formatted_prompt})
+        answer = response['result']
+        filtered_answer = filter_answer(answer)
 
-            # Store the interaction in the vector DB
-            persistent_storage(user_message, answer, user_id, embeddings, vector_db)
-            conversation_history.append((user_message, filtered_answer))
-            return jsonify({"response": answer}), 200
+        # Store the interaction in the vector DB
+        persistent_storage(question, answer, user_id, embeddings, vector_db)
+        if question and filtered_answer:
+            conversation_history = [(question, filtered_answer)]
+        user_data[user_id]["conversation_history"] = conversation_history
 
-        except Exception as e:
-            print("Error: Unexpected error, try again", e)
-        except ValueError as ve:
-            print("Error: input error", ve)
-            break
+        return jsonify({"response": answer}), 200
 
+    except Exception as e:
+        logging.error("Error: Unexpected error, try again", e)
+        return jsonify({"error": "Internal server error"}), 500
+    except ValueError as ve:
+        logging.error("Error: input error", ve)
+        return jsonify({"error": "Internal server error"}), 500
 
 @api.route('/logout', methods=['POST'])
 def logout():

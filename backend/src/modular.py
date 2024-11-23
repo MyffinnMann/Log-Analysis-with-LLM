@@ -129,10 +129,6 @@ def load_vector_db(user_id, persist_directory_base="backend/db/vector_db",
         collection_name=collection_name
     )
 
-def remove_user_data(vector_db):
-    """removes entire db, if loaded or created"""
-    vector_db.reset()
-
 def sanitize_input(user_input):
     """sanitize and filter user input"""
     sanitized = re.sub(r"[^\w\s\?\!.,-]", "", user_input).strip()
@@ -216,7 +212,7 @@ def main():
         try:
             relevant_docs = qachain.retriever.get_relevant_documents(question)
             retrieved_context = "\n".join(doc.page_content for doc in relevant_docs)
-            history_context = "\n".join([f"Q: {q}\nA: {a}" for q, a in conversation_history])
+            history_context = "\n".join([f"Q: {q}\nA: {a}" for q, a in conversation_history[-3:]])
             full_context = f"{history_context}\n{retrieved_context}"
 
             formatted_prompt = template.format(chat_instruction=chat_instruction, context=full_context, query=question)
@@ -226,7 +222,8 @@ def main():
             filtered_answer= filter_answer(answer)
             print(f"Answer: {filtered_answer}")
 
-            conversation_history.append((question, filtered_answer))
+            if question and filtered_answer:
+                conversation_history = [(question, filtered_answer)]
             persistent_storage(question, answer, user_id, embeddings, vector_db)
 
         except Exception as e:
