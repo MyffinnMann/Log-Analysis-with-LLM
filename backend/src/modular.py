@@ -35,7 +35,6 @@ def setup_ollama_model(complete_instruction, base_url, model,):
                     max_tokens = 500)
     return llm
 
-
 def setup_embeddings(use_nvidia, use_cpu):
     """Set up embedding model; can toggle between HuggingFace and Ollama embeddings.
     \n Param 1: True if use Nvidia GPU False for AMD

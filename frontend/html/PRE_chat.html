@@ -10,6 +10,7 @@
     <header class="page-header">
         <h2>SecureLang Logs (SLL)</h2>
         <button class="button logout">Log out</button>
+        <button class="button delete">Delete me?</button>
     </header>
 
     <div class="prechat-container">
@@ -63,9 +64,7 @@
                     body: formData
                 });
 
-
                 const fileResult = await fileResponse.json();
-
 
                 if (fileResponse.ok) {
                     // alert(fileResult.message); // Här visas meddellandet att det har funkat, Kommentera ur denna raden om du vill att det ska visas. Även i api.py filen
@@ -76,24 +75,6 @@
                     loadingMessage.style.display = 'none'; // Gömma meddelandet om det blir en error
                     return; // Stop execution if file upload fails
                 }
-
-                // // Send chat instructions if they exist
-                // const instructions = chatInstructionsInput.value.trim();
-                // if (instructions) {
-                //     const instructionsResponse = await fetch('http://localhost:5000/start', {
-                //         method: 'POST',
-                //         headers: { 'Content-Type': 'application/json' },
-                //         body: JSON.stringify({ message:instructions })
-                //     });
-
-                //     const instructionsResult = await instructionsResponse.json();
-
-                //     /*if (instructionsResponse.ok) {
-                //         alert(instructionsResult.message); // Display success message for instructions
-                //     } else {
-                //         alert(`Instructions Send Error: ${instructionsResult.error}`); // Display error message for instructions
-                //     }*/
-                // }
 
                 // Redirect to chat page
                 window.location.href = 'chat.html'; // Redirect to chat page
