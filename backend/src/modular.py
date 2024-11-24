@@ -7,7 +7,7 @@ from langchain.chains import RetrievalQA
 from pathlib import Path
 from langchain_huggingface import HuggingFaceEmbeddings
 import torch
-#import torch_directml # för windows lösningen för cross-platform ser bara weird ut ni är dömda till att ta cpu, sätt de i api denna filen har ingen påverkan för de, obs mikael kommentera ut 37-39 om du kör
+import torch_directml # för windows lösningen för cross-platform ser bara weird ut ni är dömda till att ta cpu, sätt de i api denna filen har ingen påverkan för de, obs mikael kommentera ut 37-39 om du kör
 # ctr + * för att kommentera ut om jag får be
 from datetime import datetime
 import re
@@ -44,9 +44,9 @@ def setup_embeddings(use_nvidia, use_cpu):
     if use_nvidia and not use_cpu:
         return HuggingFaceEmbeddings(show_progress=True,
                                     model_kwargs={"device": "cuda"})
-    # if not use_nvidia and not use_cpu:
-    #     return HuggingFaceEmbeddings(show_progress=True,
-    #                                 model_kwargs={"device": torch_directml.device()})
+    if not use_nvidia and not use_cpu:
+        return HuggingFaceEmbeddings(show_progress=True,
+                                    model_kwargs={"device": torch_directml.device()})
     if use_cpu:
         return HuggingFaceEmbeddings(show_progress=True)
 

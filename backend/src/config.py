@@ -4,7 +4,7 @@
 # - For AMD use: "use_nvidia = False" and "use_cpu = False"
 # - For CPU use: "use_nvidia = False" and "use_cpu = True"
 use_nvidia = False
-use_cpu = True
+use_cpu = False
 
 
 # Configure LLM
