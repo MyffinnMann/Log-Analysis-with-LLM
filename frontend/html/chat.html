@@ -10,6 +10,7 @@
     <header class="page-header">
         <h2>SecureLang Logs (SLL)</h2>
         <button class="button logout">Log out</button>
+        <button class="button delete">Delete me?</button>
     </header>
 
 
@@ -136,6 +137,27 @@
             }
         } catch (error) {
             console.error('Error during logout:', error);
+        }
+        });
+
+        // DELETE ME
+        document.querySelector('.delete').addEventListener('click', async function() {
+        try {
+            const response = await fetch('/delete_me', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                alert("Deletion succeeded")
+                window.location.href = '/';
+            }
+        } catch (error) {
+            console.error('Error during deletion:', error);
         }
         });
     </script>

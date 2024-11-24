@@ -220,5 +220,13 @@ def logout():
     session.clear()
     return jsonify({"success": True}), 200
 
+@api.route('/delete_me', methods=['POST'])
+def delete_me():
+    user_directory = Path(f"backend/db/vector_db/{user_id}")
+    remove_user_data(user_directory)
+    #________FUNKTION FÖR att ta bort användare i db__________?
+    logout()
+    return jsonify({"success": True}), 200
+
 if __name__ == '__main__':
     api.run(host='0.0.0.0', port=5000, debug=True)
