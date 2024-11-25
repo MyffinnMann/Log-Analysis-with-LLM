@@ -22,7 +22,7 @@
         </div>
         <div class="predefined-questions-c" id="predefined-questions">     <!---Man kan bara lägga till fler så många frågor man nu vill ha. Den skickar sedan knapp trycket som ett vanligt meddelande-->
             <button class="question-btn">From the given file what are the two most alarming issues</button>
-            <button class="question-btn">What are two mitigation that i can implement from the logfile</button>
+            <button class="question-btn">What are two mitigation that i can implement from the log file</button>
             <button class="question-btn">Can you identify any unauthorized access attempts in the log file?</button>
         </div>
         <div class="chat-input">
@@ -45,7 +45,7 @@
         predefinedQuestions.addEventListener('click', async (event) => {
             if (event.target.classList.contains('question-btn')) {
                 const question = event.target.textContent;
-                
+
                 // Skicka frågan som ett användarmeddelande
                 const userMsgDiv = document.createElement('div');
                 userMsgDiv.classList.add('chat-message', 'user');
@@ -97,15 +97,10 @@
                 if (response.ok) {
                     const botMsgDiv = document.createElement('div');
                     botMsgDiv.classList.add('chat-message', 'bot');
-                    
-                    const answerArr = result.response.split("\n");
-                    let multiLineAnswer = "";
-                    
-                    for (let i of answerArr){
-                        multiLineAnswer += `<p>${i}</p>`;
-                    }
 
-                    botMsgDiv.innerHTML = multiLineAnswer//`<p>${result.response}</p>`;
+                    const answerArr = result.response.replace(/\r\n/g, '\n').split("\n");
+                    botMsgDiv.innerHTML = answerArr.map(line => `<p>${line}</p>`).join("\n");
+
                     chatWindow.appendChild(botMsgDiv);
                 } else {
                     const botMsgDiv = document.createElement('div');
