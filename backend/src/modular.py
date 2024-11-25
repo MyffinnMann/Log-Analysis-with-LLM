@@ -14,6 +14,7 @@ import re
 import os
 import time
 import logging
+import shutil
 
 logging.basicConfig(level=logging.INFO) # detta kanske är onödigt, FREDAG
 keywords = ["password", "username", "user_id"] #fyll på denna med vad ni tänker att den inte säga eller ens interagera med
@@ -81,6 +82,10 @@ def setup_vector_db(chunks,
             collection_name=collection_name,
             persist_directory=str(persist_directory)
     )
+
+def delete_vector_db(vector_db):
+    """delete the database for a specific user.\nparam: vector db"""
+    vector_db.reset_collection()
 
 def setup_qa_chain(llm_instance,
                                 vector_db,

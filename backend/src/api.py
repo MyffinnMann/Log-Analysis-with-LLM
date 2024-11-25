@@ -21,7 +21,8 @@ from modular import(
     setup_vector_db,
     sanitize_input,
     setup_qa_chain,
-    filter_answer
+    filter_answer,
+    delete_vector_db
 )
 from config import(
     template,
@@ -225,9 +226,8 @@ def logout():
 
 @api.route('/delete_me', methods=['POST'])
 def delete_me():
-    user_id = session["user_id"]
-    user_directory = Path(f"backend/db/vector_db/{user_id}")
-    os.remove(user_directory)
+    vector_db=user_data[user_id]["vector_db"]
+    delete_vector_db(vector_db)
     #________FUNKTION FÖR att ta bort användare i db__________?
     return jsonify({"success": True}), 200
 
