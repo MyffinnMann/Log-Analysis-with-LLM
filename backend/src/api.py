@@ -22,6 +22,7 @@ from modular import(
     sanitize_input,
     setup_qa_chain,
     filter_answer,
+    remove_data
 )
 from config import(
     template,
@@ -218,6 +219,14 @@ def chat():
 @api.route('/logout', methods=['POST'])
 def logout():
     session.clear()
+    return jsonify({"success": True}), 200
+
+@api.route('/delete_me', methods=['POST'])
+def delete_me():
+    user_directory = Path(f"backend/db/vector_db/{user_id}")
+    os.remove(user_directory)                              
+    #________FUNKTION FÖR att ta bort användare i db__________?
+    logout()
     return jsonify({"success": True}), 200
 
 if __name__ == '__main__':
