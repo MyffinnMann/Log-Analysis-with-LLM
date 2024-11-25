@@ -21,8 +21,7 @@ from modular import(
     setup_vector_db,
     sanitize_input,
     setup_qa_chain,
-    filter_answer,
-    remove_data
+    filter_answer
 )
 from config import(
     template,
@@ -118,6 +117,7 @@ def login():
 # pre chat
 @api.route('/setup', methods=['POST'])
 def setup():
+    user_id = session["user_id"]
     user_data[user_id] = {}
     chat_instruction = request.form.get('chat-instruction')
 
@@ -201,6 +201,8 @@ def chat():
         answer = response['result']
         filtered_answer = filter_answer(answer)
 
+        print(filtered_answer)
+
         # Store the interaction in the vector DB
         persistent_storage(question, answer, user_id, embeddings, vector_db)
         if question and filtered_answer:
@@ -223,10 +225,10 @@ def logout():
 
 @api.route('/delete_me', methods=['POST'])
 def delete_me():
+    user_id = session["user_id"]
     user_directory = Path(f"backend/db/vector_db/{user_id}")
-    os.remove(user_directory)                              
+    os.remove(user_directory)
     #________FUNKTION FÖR att ta bort användare i db__________?
-    logout()
     return jsonify({"success": True}), 200
 
 if __name__ == '__main__':

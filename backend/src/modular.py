@@ -74,7 +74,6 @@ def split_documents(data, chunk_size=1000,
 def setup_vector_db(chunks,
                                 embeddings, collection_name="local",
                                 persist_directory=None):
-
     """Create a vector database from document chunks and embeddings."""
     return Chroma.from_documents(
             documents=chunks,
@@ -82,7 +81,6 @@ def setup_vector_db(chunks,
             collection_name=collection_name,
             persist_directory=str(persist_directory)
     )
-
 
 def setup_qa_chain(llm_instance,
                                 vector_db,
@@ -151,7 +149,6 @@ def rate_limit(last_call_time, rate_limit_sec=1):
     if elapsed_time < rate_limit_sec:
         time.sleep(rate_limit_sec - elapsed_time)
     return time.time()
-
 
 def main():
     chat_instruction = "ignore all that include chrome.exe"

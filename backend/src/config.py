@@ -3,7 +3,7 @@
 # - For NVIDIA use: "use_nvidia = True" and "use_cpu = False"
 # - For AMD use: "use_nvidia = False" and "use_cpu = False"
 # - For CPU use: "use_nvidia = False" and "use_cpu = True"
-use_nvidia = False
+use_nvidia = True
 use_cpu = False
 
 
