@@ -58,7 +58,7 @@
                     formData.append('chat-instruction', instructions); // Lägg till instruktioner
                 }
                 // Upload the log file
-                const fileResponse = await fetch('http://localhost:5000/setup', {
+                const fileResponse = await fetch('setup', {
                     method: 'POST',
                     body: formData
                 });
