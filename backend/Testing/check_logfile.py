@@ -1,3 +1,5 @@
+"""Denna filen är för att testa LLM's svar med logfilen"""
+
 def search_in_log(logfil, sök_ord):
     try:
         with open(logfil, 'r') as file:
