@@ -121,6 +121,13 @@ def login():
         "chat-instruction": None
         }
 
+        user_data[user_id] = {
+        'user_directory': str(Path(f"../backend/db/user_db/{user_id}")),
+        'vector_db': None,
+        'ollama_instance': None,
+        "chat-instruction": None
+        }
+
         return jsonify({"success": True, "user_id": user_id}), 200
     else:
         return jsonify({"success": False}), 401
