@@ -136,6 +136,7 @@ def setup():
 
     # Förbered filen för vektorlagring
     log_file_path = Path(file.filename)
+    file.save(log_file_path)
     data = load_document(log_file_path)
     chunks = split_documents(data)
 
@@ -152,6 +153,7 @@ def setup():
         'ollama_instance': ollama_instance,
         "chat-instruction": chat_instruction # behöver ha denna senare sätter den här
     }
+    os.remove(log_file_path)
     return jsonify({"Success": True}), 200 # kod 200 att det lyckades
 
 # Chat Route
