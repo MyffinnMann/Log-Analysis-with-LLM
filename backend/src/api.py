@@ -104,7 +104,7 @@ def login():
     Bo_value = DB.check_login(user_id, password)
     if Bo_value:
         session["user_id"] = user_id
-        session['user_directory'] = str(Path(f"../backend/db/user_db/{user_id}"))
+        session['user_directory'] = str(Path(f"../backend/db/vector_db/{user_id}"))
 
         return jsonify({"success": True, "user_id": user_id}), 200
     else:
@@ -136,6 +136,7 @@ def setup():
 
     # Förbered filen för vektorlagring
     log_file_path = Path(file.filename)
+    file.save(log_file_path)
     data = load_document(log_file_path)
     chunks = split_documents(data)
 
@@ -152,6 +153,7 @@ def setup():
         'ollama_instance': ollama_instance,
         "chat-instruction": chat_instruction # behöver ha denna senare sätter den här
     }
+    os.remove(log_file_path)
     return jsonify({"Success": True}), 200 # kod 200 att det lyckades
 
 # Chat Route
@@ -226,7 +228,7 @@ def delete_me():
     user_id = session.get("user_id")
     vector_db=user_data[user_id]["vector_db"]
     delete_vector_db(vector_db)
-
+    session.clear()
     return jsonify({"success": True}), 200
 
 if __name__ == '__main__':
