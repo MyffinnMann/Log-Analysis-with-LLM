@@ -228,7 +228,7 @@ def delete_me():
     user_id = session.get("user_id")
     vector_db=user_data[user_id]["vector_db"]
     delete_vector_db(vector_db)
-
+    session.clear()
     return jsonify({"success": True}), 200
 
 if __name__ == '__main__':
