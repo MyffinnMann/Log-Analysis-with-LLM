@@ -104,7 +104,7 @@ def login():
     Bo_value = DB.check_login(user_id, password)
     if Bo_value:
         session["user_id"] = user_id
-        session['user_directory'] = str(Path(f"../backend/db/user_db/{user_id}"))
+        session['user_directory'] = str(Path(f"../backend/db/vector_db/{user_id}"))
 
         return jsonify({"success": True, "user_id": user_id}), 200
     else:
