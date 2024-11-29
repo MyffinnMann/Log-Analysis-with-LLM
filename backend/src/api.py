@@ -98,18 +98,13 @@ def pre_chat():
 @api.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    username = data.get('username')
+    user_id = data.get('username')
     password = data.get('password')
 
-    Bo_value = DB.check_login(username, password)
+    Bo_value = DB.check_login(user_id, password)
     if Bo_value:
-        global user_id
-        user_id = username
-        user_directory = Path(f"../backend/db/user_db/{user_id}")
-
-        # Store user session data
         session["user_id"] = user_id
-        session['user_directory'] = str(user_directory)
+        session['user_directory'] = str(Path(f"../backend/db/user_db/{user_id}"))
 
         return jsonify({"success": True, "user_id": user_id}), 200
     else:
@@ -118,12 +113,12 @@ def login():
 # pre chat
 @api.route('/setup', methods=['POST'])
 def setup():
-    user_id = session["user_id"]
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"Error": "user not logged in"}), 401
+
     user_data[user_id] = {}
     chat_instruction = request.form.get('chat-instruction')
-
-    if not user_id:
-        return jsonify({"error": "User not logged in"}), 401
 
     if 'logfile' not in request.files:
         return jsonify({"error": "No file part"}), 400
@@ -141,11 +136,10 @@ def setup():
 
     # Förbered filen för vektorlagring
     log_file_path = Path(file.filename)
-    file.save(log_file_path)  # Spara filen temporärt
     data = load_document(log_file_path)
     chunks = split_documents(data)
 
-    user_directory = Path(f"backend/db/vector_db/{user_id}") # Path(session["user_directory"])    FUNKAR I VSC OCH MAN KÖR TERMINAL I FOLDER UTANFÖR BACKEND ETT STEG 
+    user_directory = Path(f"backend/db/vector_db/{user_id}") # Path(session["user_directory"])    FUNKAR I VSC OCH MAN KÖR TERMINAL I FOLDER UTANFÖR BACKEND ETT STEG
     if user_directory.exists():
         vector_db = load_vector_db(user_id=user_id, embeddings=embedding)
     else:
@@ -202,8 +196,6 @@ def chat():
         answer = response['result']
         filtered_answer = filter_answer(answer)
 
-        print(filtered_answer)
-
         # Store the interaction in the vector DB
         persistent_storage(question, answer, user_id, embeddings, vector_db)
         if question and filtered_answer:
@@ -221,14 +213,20 @@ def chat():
 
 @api.route('/logout', methods=['POST'])
 def logout():
+    """logout from web application"""
+
     session.clear()
+
     return jsonify({"success": True}), 200
 
 @api.route('/delete_me', methods=['POST'])
 def delete_me():
+    """remove information on user in database"""
+
+    user_id = session.get("user_id")
     vector_db=user_data[user_id]["vector_db"]
     delete_vector_db(vector_db)
-    #________FUNKTION FÖR att ta bort användare i db__________?
+
     return jsonify({"success": True}), 200
 
 if __name__ == '__main__':
