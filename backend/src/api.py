@@ -9,7 +9,7 @@ from flask import(
 from flask_cors import CORS
 import DB
 from datetime import timedelta
-from modular import(
+from LLM import(
     setup_embeddings,
     persistent_storage,
     logging, Path,
@@ -126,7 +126,7 @@ def setup():
     file = request.files["logfile"]
 
     if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400 #test #vad är detta för test? /oscar
+        return jsonify({"error": "No selected file"}), 400
 
     # Setup Ollama model
     ollama_instance = setup_ollama_model(f"{template} {chat_instruction}", base_url=base_url, model=model_name)
