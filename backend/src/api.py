@@ -136,7 +136,6 @@ def setup():
 
     # Förbered filen för vektorlagring
     log_file_path = Path(file.filename)
-    file.save(log_file_path)  # Spara filen temporärt
     data = load_document(log_file_path)
     chunks = split_documents(data)
 
