@@ -3,7 +3,7 @@ import sqlite3
 from argon2 import PasswordHasher
 import random
 import string
-from modular import logging
+from LLM import logging
 
 ph = PasswordHasher()
 
