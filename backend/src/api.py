@@ -228,6 +228,10 @@ def delete_me():
     user_id = session.get("user_id")
     vector_db=user_data[user_id]["vector_db"]
     delete_vector_db(vector_db)
+    #ALT LÖSNING FÖR ATT LADDA OLIKA .log filer och för att radera user_data ordentligt
+    # current_dir = os.getcwd()
+    # user_dir = Path(f"{current_dir}/backend/db/vector_db/{user_id}")
+    # shutil.rmtree(user_dir)
     session.clear()
     return jsonify({"success": True}), 200
 
