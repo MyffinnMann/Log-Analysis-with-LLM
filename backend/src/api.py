@@ -8,12 +8,13 @@ from flask import(
 )
 from flask_cors import CORS
 import DB
+import os
 from datetime import timedelta
 from LLM import(
     setup_embeddings,
     persistent_storage,
-    logging, Path,
-    os,
+    logging,
+    Path,
     setup_ollama_model,
     load_document,
     load_vector_db,
@@ -106,9 +107,31 @@ def login():
         session["user_id"] = user_id
         session['user_directory'] = str(Path(f"../backend/db/vector_db/{user_id}"))
 
+        user_data[user_id] = {
+        'user_directory': str(Path(f"../backend/db/user_db/{user_id}")),
+        'vector_db': None,
+        'ollama_instance': None,
+        "chat-instruction": None
+        }
+
+        user_data[user_id] = {
+        'user_directory': str(Path(f"../backend/db/user_db/{user_id}")),
+        'vector_db': None,
+        'ollama_instance': None,
+        "chat-instruction": None
+        }
+
+        user_data[user_id] = {
+        'user_directory': str(Path(f"../backend/db/user_db/{user_id}")),
+        'vector_db': None,
+        'ollama_instance': None,
+        "chat-instruction": None
+        }
+
         return jsonify({"success": True, "user_id": user_id}), 200
     else:
         return jsonify({"success": False}), 401
+
 
 # pre chat
 @api.route('/setup', methods=['POST'])
@@ -117,7 +140,6 @@ def setup():
     if not user_id:
         return jsonify({"Error": "user not logged in"}), 401
 
-    user_data[user_id] = {}
     chat_instruction = request.form.get('chat-instruction')
 
     if 'logfile' not in request.files:
@@ -129,7 +151,10 @@ def setup():
         return jsonify({"error": "No selected file"}), 400
 
     # Setup Ollama model
-    ollama_instance = setup_ollama_model(f"{template} {chat_instruction}", base_url=base_url, model=model_name)
+    if (user_data[user_id]["ollama_instance"] is None):
+        ollama_instance = setup_ollama_model(f"{template} {chat_instruction}", base_url=base_url, model=model_name)
+    else:
+        ollama_instance = user_data[user_id]["ollama_instance"]
 
     # Setup embeddings
     embedding = setup_embeddings(use_nvidia, use_cpu)
@@ -146,12 +171,11 @@ def setup():
     else:
         vector_db = setup_vector_db(chunks, embedding, persist_directory=user_directory)
 
-    # vi kör på detta
     user_data[user_id] = {
         'user_directory': user_directory,
         'vector_db': vector_db,
         'ollama_instance': ollama_instance,
-        "chat-instruction": chat_instruction # behöver ha denna senare sätter den här
+        "chat-instruction": chat_instruction
     }
     os.remove(log_file_path)
     return jsonify({"Success": True}), 200 # kod 200 att det lyckades
@@ -159,6 +183,7 @@ def setup():
 # Chat Route
 @api.route('/chat', methods=['POST'])
 def chat():
+    setup()
     user_id = session["user_id"]
 
     if not user_id:
@@ -173,7 +198,7 @@ def chat():
     # ta fram information vi har från setup
     ollama_instance = user_data[user_id]["ollama_instance"]
     vector_db = user_data[user_id]["vector_db"]
-    embeddings = setup_embeddings(False, True) # param 1 = nvidia, param 2 = cpu
+    embeddings = setup_embeddings(use_nvidia, use_cpu) # param 1 = nvidia, param 2 = cpu # kommer från config
 
     if ollama_instance is None or vector_db is None:
         return jsonify({"error": "Model or Vector DB not initialized"}), 500
@@ -224,7 +249,7 @@ def logout():
 @api.route('/delete_me', methods=['POST'])
 def delete_me():
     """remove information on user in database"""
-
+    setup()
     user_id = session.get("user_id")
     vector_db=user_data[user_id]["vector_db"]
     delete_vector_db(vector_db)
