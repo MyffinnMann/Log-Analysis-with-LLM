@@ -10,4 +10,3 @@ testtext.log
 backend/db/vector_db/
 backend/db/user_db/
 backend/src/config.py
-Test_Result.xlsx

@@ -1,17 +1,19 @@
-from LLM import(
+import sys
+import os
+import uuid
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import openpyxl
+from LLM import (
     setup_embeddings,
-    Path,
     setup_ollama_model,
     load_document,
     split_documents,
     setup_vector_db,
     setup_qa_chain,
-    filter_answer,
-    get_user_id,
+    Path,
     rate_limit,
     time
 )
-import openpyxl
 
 def run_test_instance(log_file_path, questions, excel_path):
     """Runs an one instance of ollama with a specific question"""
@@ -33,7 +35,7 @@ def run_test_instance(log_file_path, questions, excel_path):
     use_cpu = False
     model_name = "llama3.2:3b"
     base_url = "http://127.0.0.1:11434"
-    user_id = get_user_id()
+    user_id = f"user_{int(time.time())}"
 
     ollama_instance = setup_ollama_model(base_url=base_url,
                                                                     model=model_name,
@@ -50,42 +52,37 @@ def run_test_instance(log_file_path, questions, excel_path):
 
     wb = openpyxl.Workbook()
     sheet = wb.active
-    sheet.title = "Test result" # byt denna till namnet på test varianten
-    sheet.append(["Question", "Answer"])
+    sheet.title = "Test result True Positive" # byt denna till namnet på test varianten
+    sheet.append(["Run", "Question", "Answer"])
+    for run_number in range(1,51):
+        for question in questions:
+            try:
+                last_call_time = time.time()
+                last_call_time = rate_limit(last_call_time)
+                relevant_docs = qachain.retriever.get_relevant_documents(question)
+                retrieved_context = "\n".join(doc.page_content for doc in relevant_docs)
 
-    for question in questions:
-        try:
-            last_call_time = time.time()
-            last_call_time = rate_limit(last_call_time)
-            relevant_docs = qachain.retriever.get_relevant_documents(question)
-            retrieved_context = "\n".join(doc.page_content for doc in relevant_docs)
+                formatted_prompt = template.format(chat_instruction=chat_instruction,
+                                                                        context=retrieved_context,
+                                                                        query=question)
+                response = qachain.invoke({"query": formatted_prompt})
+                answer = response['result']
+                sheet.append([run_number, question, answer])
+                #  ska in först nedan
+                print(f"Run: {run_number}, Q: {question}\nA: {answer}\n")
 
-            formatted_prompt = template.format(chat_instruction=chat_instruction,
-                                                                    context=retrieved_context,
-                                                                    query=question)
-            response = qachain.invoke({"query": formatted_prompt})
-            filtered_answer= filter_answer( response['result'])
-            sheet.append([question, filtered_answer])
-            print(f"Q: {question}\nA: {filtered_answer}\n")
-
-        except Exception as e:
-            print("Error: Unexpected error, try again", e)
+            except Exception as e:
+                print("Error: Unexpected error, try again", e)
 
     wb.save(excel_path)
     print("filen har sparats")
 
 if __name__ == "__main__":
-    log_file_path = Path(__file__).with_name("Proxifier.log") # byt denna till filen som du gjort
+    log_file_path = Path(__file__).with_name("bruteforcePos.log") # byt denna till filen som du gjort
     questions = [
-        "brute force?",
-        "vad kan jag göra på en ssh server?"
+        "Thoose the log contain a brute force attack?",
+        "What configuration shold i add to protect my ssh server?"
     ]
-    excel_path = "Test_Results.xlsx"
+    excel_path = Path("backend/src/test_LLM/Test_Results_TP.xlsx")
 
     run_test_instance(log_file_path, questions, excel_path)
-
-
-# koluument a1 s1 a2 s2
-# kör 50 gng typ
-# de olika logfilerna
-# frågor
