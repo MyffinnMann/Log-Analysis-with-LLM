@@ -1,0 +1,14 @@
+flask
+flask-cors
+langchain
+langchain-community
+langchain-ollama
+langchain-chroma
+langchain-huggingface
+torch
+torch-directml
+torchvision
+torchaudio
+chromadb
+huggingface-hub
+argon2-cffi
