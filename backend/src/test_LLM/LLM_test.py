@@ -11,7 +11,8 @@ from LLM import (
     setup_qa_chain,
     Path,
     rate_limit,
-    time
+    time,
+    delete_vector_db
 )
 
 def run_test_instance(log_file_path, questions, excel_path):
@@ -73,6 +74,10 @@ def run_test_instance(log_file_path, questions, excel_path):
 
             except Exception as e:
                 print("Error: Unexpected error, try again", e)
+        try:
+            delete_vector_db(vector_db)
+        except Exception as e:
+            print("Error: could not delete vector db", e)
 
     wb.save(excel_path)
     print("filen har sparats")
@@ -119,13 +124,13 @@ def clean_act_as_if():
 
 
 def main():
-    #print("Running test where there is brute force in the file:\n")
-    #brute_ask_brute()
+    print("Running test where there is brute force in the file:\n")
+    brute_ask_brute()
 
-    #print("Running the file without the bruteforce and asking as if it is\n")
-    #clean_ask_brute()
+    print("Running the file without the bruteforce and asking as if it is\n")
+    clean_ask_brute()
 
-    print("Running brute and state not, ask stupid question after\n")
+    print("Running brute and state not\n")
     brute_state_not_brute()
 
     print("Running forcing for saying it is attack")
