@@ -10,7 +10,6 @@ from LLM import(
     sanitize_input,
     setup_qa_chain,
     filter_answer,
-    get_user_id,
     rate_limit,
     time
 )
@@ -30,7 +29,7 @@ def main():
 
     Answer:
     """
-    log_file_path = Path(__file__).with_name("Proxifier.log")  # path
+    log_file_path = Path(__file__).with_name("sql_injection_log.log")  # path
 
     # detta ska sättas här och i api ska inte vara beroende på denna filen om de är de säg till mig /oscar
     use_nvidia = True  # sätt till false för amd
@@ -40,7 +39,7 @@ def main():
     #om ni har latest är de 3b men kommer inte fungera om ni inte pullat 3b specifikt
     # kör detta: ollama pull llama3.2:3b
     base_url = "http://127.0.0.1:11434"
-    user_id = get_user_id()
+    user_id = "user_1"
 
     ollama_instance = setup_ollama_model(base_url=base_url,
                                                                     model=model_name,
@@ -80,11 +79,11 @@ def main():
             response = qachain.invoke({"query": formatted_prompt})
 
             answer = response['result']
-            filtered_answer= filter_answer(answer)
-            print(f"Answer: {filtered_answer}")
+            #filtered_answer= filter_answer(answer)
+            print(f"Answer: {answer}")
 
-            if question and filtered_answer:
-                conversation_history = [(question, filtered_answer)]
+            if question and answer:
+                conversation_history = [(question, answer)]
             persistent_storage(question, answer, user_id, embeddings, vector_db)
 
         except Exception as e:
