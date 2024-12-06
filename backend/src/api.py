@@ -102,21 +102,24 @@ def login():
     user_id = data.get('username')
     password = data.get('password')
 
-    Bo_value = DB.check_login(user_id, password)
-    if Bo_value:
-        session["user_id"] = user_id
-        session['user_directory'] = str(Path(f"../backend/db/vector_db/{user_id}"))
+    if (user_id and password):
+        Bo_value = DB.check_login(user_id, password)
+        if Bo_value:
+            session["user_id"] = user_id
+            session['user_directory'] = str(Path(f"../backend/db/vector_db/{user_id}"))
 
-        user_data[user_id] = {
-        'user_directory': str(Path(f"../backend/db/vector_db/{user_id}")),
-        'vector_db': None,
-        'ollama_instance': None,
-        "chat-instruction": None
-        }
+            user_data[user_id] = {
+            'user_directory': str(Path(f"../backend/db/vector_db/{user_id}")),
+            'vector_db': None,
+            'ollama_instance': None,
+            "chat-instruction": None
+            }
 
-        return jsonify({"success": True, "user_id": user_id}), 200
+            return jsonify({"success": True, "user_id": user_id}), 200
+        else:
+            return jsonify({"success": False}), 401
     else:
-        return jsonify({"success": False}), 401
+        return jsonify({"success": False}), 400
 
 # pre chat
 @api.route('/setup', methods=['POST'])
