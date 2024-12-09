@@ -6,7 +6,6 @@ from flask import(
     send_from_directory,
     session,
 )
-from flask_cors import CORS
 import DB
 import os
 from datetime import timedelta
@@ -31,11 +30,14 @@ from config import(
     model_name,
     use_cpu,
     use_nvidia,
+    LOGIN_LIMIT,
 )
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 # flask application startup
 api = Flask(__name__)
-CORS(api)
+limiter = Limiter(get_remote_address, app=api)
 
 user_data = {}
 logging.basicConfig(level=logging.INFO) # ta bort denna om ni har något bättre
@@ -97,6 +99,7 @@ def pre_chat():
 
 # login
 @api.route('/login', methods=['POST'])
+@limiter.limit(f"{LOGIN_LIMIT} per minute")
 def login():
     data = request.get_json()
     user_id = data.get('username')

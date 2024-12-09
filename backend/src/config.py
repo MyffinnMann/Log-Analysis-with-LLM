@@ -23,3 +23,4 @@ template = """
 
     Answer:
     """
+LOGIN_LIMIT = 3
