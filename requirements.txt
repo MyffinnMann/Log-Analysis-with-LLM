@@ -1,5 +1,4 @@
 flask
-flask-cors
 langchain
 langchain-community
 langchain-ollama
@@ -12,3 +11,4 @@ torchaudio
 chromadb
 huggingface-hub
 argon2-cffi
+Flask-Limiter
