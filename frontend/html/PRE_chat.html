@@ -53,10 +53,9 @@
                 const formData = new FormData();
                 formData.append('logfile', logfileInput.files[0]);
 
-                // Lägg till chat-instruktioner i FormData
                 const instructions = chatInstructionsInput.value.trim();
                 if (instructions) {
-                    formData.append('chat-instruction', instructions); // Lägg till instruktioner
+                    formData.append('chat-instruction', instructions); 
                 }
                 // Upload the log file
                 const fileResponse = await fetch('setup', {
@@ -67,8 +66,6 @@
                 const fileResult = await fileResponse.json();
 
                 if (fileResponse.ok) {
-                    // alert(fileResult.message); // Här visas meddellandet att det har funkat, Kommentera ur denna raden om du vill att det ska visas. Även i api.py filen
-                    // Redirect to chat page
                     window.location.href = 'chat.html'; // Redirect to chat page
                 } else {
                     alert(`File Upload Error: ${fileResult.error}`); // Display error message for file upload
@@ -79,7 +76,7 @@
                 // Redirect to chat page
                 window.location.href = 'chat.html'; // Redirect to chat page
             } else {
-                //alert('Please select a log file before starting the conversation.');
+                alert('Please select a log file before starting the conversation.');
             }
         });
 

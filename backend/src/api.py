@@ -38,8 +38,8 @@ api = Flask(__name__)
 CORS(api)
 
 user_data = {}
-logging.basicConfig(level=logging.INFO) # ta bort denna om ni har något bättre
-keywords = ["password", "username", "user_id"] # fyll på denna medan vi testar
+logging.basicConfig(level=logging.INFO) 
+keywords = ["password", "username", "user_id"] 
 
 # create db
 DB_PATH = Path("backend/db/securelang.db")
@@ -147,13 +147,13 @@ def setup():
     # Setup embeddings
     embedding = setup_embeddings(use_nvidia, use_cpu)
 
-    # Förbered filen för vektorlagring
+   
     log_file_path = Path(file.filename)
     file.save(log_file_path)
     data = load_document(log_file_path)
     chunks = split_documents(data)
 
-    user_directory = Path(f"backend/db/vector_db/{user_id}") # Path(session["user_directory"])    FUNKAR I VSC OCH MAN KÖR TERMINAL I FOLDER UTANFÖR BACKEND ETT STEG
+    user_directory = Path(f"backend/db/vector_db/{user_id}")
     if user_directory.exists():
         vector_db = load_vector_db(user_id=user_id, embeddings=embedding)
     else:
