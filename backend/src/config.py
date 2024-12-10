@@ -23,4 +23,6 @@ template = """
 
     Answer:
     """
-LOGIN_LIMIT = 3
+
+# The maximum number of connections allowed per url per minute
+LOGIN_LIMIT = 100
