@@ -105,3 +105,21 @@ Follow these steps to set up and run the application:
 - Refactor frontend for better responsiveness and accessibility.
 
 ---
+
+## Libraries used in the project:
+- **[Flask](https://pypi.org/project/Flask/)**: Flask is a lightweight python web application framework.
+- **[Langchain](https://pypi.org/project/langchain/)**: LangChain is a framework for developing applications powered by large language models (LLMs).
+- **[langchain-community](https://pypi.org/project/langchain-community/)**: LangChain Community contains third-party integrations that implement the base interfaces defined in LangChain Core, making them ready-to-use in any LangChain application.
+- **[langchain-ollama](https://pypi.org/project/langchain-ollama/)**: This package contains the LangChain integration with Ollama. Ollama needs to run locally.
+- **[langchain-chroma](https://pypi.org/project/langchain-chroma/)**: This package contains the LangChain integration with Chroma. 
+- **[langchain-huggingface](https://pypi.org/project/langchain-huggingface/)**: This package contains the LangChain integrations for huggingface related classes.
+- **[torch](https://pypi.org/project/torch/)**: Tensors and Dynamic neural networks in Python with strong GPU acceleration
+- **[torch-directml](https://pypi.org/project/torch-directml/)**: A DirectML backend for hardware acceleration in PyTorch. 
+- **[torchvision](https://pypi.org/project/torchvision/)**: Image and video datasets and models for torch deep learning
+- **[torchaudio](https://pypi.org/project/torchaudio/)**: An audio package for PyTorch
+- **[chromadb](https://pypi.org/project/chromadb/)**: Open-source embedding database. 
+- **[huggingface-hub](https://pypi.org/project/huggingface-hub/)**: Client library to download and publish models, datasets and other repos on the huggingface.co hub
+- **[argon2-cffi](https://pypi.org/project/argon2-cffi/)**: Argon2 for Python
+- **[Flask-Limiter](https://pypi.org/project/Flask-Limiter/)**: Rate limiting for flask applications
+
+---
