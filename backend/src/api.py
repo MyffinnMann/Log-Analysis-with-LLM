@@ -108,7 +108,7 @@ def login():
     if (user_id and password):
         Bo_value = DB.check_login(user_id, password)
         if Bo_value:
-            session["user_id"] = user_id
+            session["user_id"] = DB.map_user_to_session_id(user_id)
             session['user_directory'] = str(Path(f"../backend/db/vector_db/{user_id}"))
 
             user_data[user_id] = {
@@ -175,7 +175,7 @@ def setup():
 @api.route('/chat', methods=['POST'])
 def chat():
     setup()
-    user_id = session["user_id"]
+    user_id = DB.map_session_id_to_user(session["user_id"])
 
     if not user_id:
         return jsonify({"error": "User not logged in"}), 401
@@ -232,7 +232,7 @@ def chat():
 @api.route('/logout', methods=['POST'])
 def logout():
     """logout from web application"""
-
+    DB.remove_session_id(session["user_id"])
     session.clear()
 
     return jsonify({"success": True}), 200
