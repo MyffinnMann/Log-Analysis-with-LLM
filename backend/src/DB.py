@@ -36,7 +36,7 @@ def check_login(username, pas):
         stored_pas = cursor.fetchone()
         Bo_value = verify_pas(stored_pas[0], pas)
         ## skapa session id om inloggningen lyckas
-        if Bo_value:
+        if Bo_value and check_user_has_session(username) == False:
             try:
                 session_id = generate_session_id()
                 cursor.execute(sql_query2, (session_id, username))
@@ -161,3 +161,56 @@ def remove_session_id(session_phrase):
     finally:
         conn.close()
 ## funktion för att ta bort användarens namn
+
+
+
+## check if session id exists for user
+def check_session_id(session_id):
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute('''
+                       SELECT * FROM Session WHERE session_ID = ?;
+                          ''', (session_id,))
+        result = cursor.fetchone()
+        if result:
+            return True
+        else:
+            return False
+    except sqlite3.Error as e:
+        print("Error checking session id:", e)
+        return False
+
+
+## check if a user has a session id
+def check_user_has_session(username):
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute('''
+                       SELECT * FROM Session WHERE username = ?;
+                          ''', (username,))
+        result = cursor.fetchone()
+        if result:
+            return True
+        else:
+            return False
+    except sqlite3.Error as e:
+        print("Error checking user has session id:", e)
+        return False
+
+## funktion för att ta bort användarens namn och session id från databasen
+def delete_user(username):
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute('''
+        DELETE FROM user WHERE username = ?;
+        ''', (username,))
+        conn.commit()
+        cursor.execute('''DELETE FROM Session WHERE username = ?;''', (username,))
+        conn.commit()
+    except sqlite3.Error as e:
+        print("Error deleting user")
+    finally:
+        conn.close()
