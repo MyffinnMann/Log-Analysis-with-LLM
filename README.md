@@ -2,7 +2,17 @@
 
 SecureLang Logs (SLL) is a secure logging and chat application designed to handle user authentication, secure communication, and custom log analysis through an intuitive web-based interface.
 
-## Deployment
+## Team Members
+- Ibrahim Abd Ulrahman
+- Samuel Ek
+- Natnael Kidane
+- Mikael Strandlund
+- Melvin Ferdinandsson
+- Oscar Lövkvist Larsson
+
+## Project Folder Structure
+- Backend: Contains the server-side code for the application.
+- Oscar fortsätter 
 
 Follow these steps to set up and run the application:
 
