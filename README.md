@@ -52,3 +52,59 @@ Follow these steps to set up and run the application:
 - **[Flask-Limiter](https://pypi.org/project/Flask-Limiter/)**: Rate limiting for flask applications
 
 ---
+
+## Project Structure
+
+```plaintext
+LOG-ANALYSIS-WITH-LLM/
+│
+├── backend/
+│   ├── db/
+│   │   ├── vector_db/
+│   │   └── securelang.db
+│   │
+│   └── src/
+│       ├── __pycache__/
+│       ├── test_LLM/
+│       │   ├── bruteforcePos.log
+│       │   ├── clean_log.log
+│       │   ├── LLM_test.py
+│       │   ├── SSH.log
+│       │   ├── Test_Results_agree_trow.xlsx
+│       │   ├── Test_Results_attack.xlsx
+│       │   ├── Test_Results_clean.xlsx
+│       │   ├── Test_Results_no_attack_act_as_if.xlsx
+│       │   └── __init__.py
+│       │
+│       ├── api.py
+│       ├── config.py
+│       ├── DB.py
+│       ├── LLM_main.py
+│       ├── LLM.py
+│       └── Proxifier.log
+│
+├── Testing/
+│   └── check_logfile.py
+│
+├── frontend/
+│   └── html/
+│       ├── css/
+│       ├── chat.html
+│       ├── index.html
+│       ├── login.html
+│       └── PRE_chat.html
+│
+├── .gitignore
+├── nginx.md
+├── README.md
+├── requirements.txt
+└── structure.md
+```
+### Explanation:
+- **backend**: Contains the main backend logic, database, and LLM.
+  - `db`: Database folder for user and vector storage.
+  - `src`: Backend source code, including tests, configurations, and logs.
+- **Testing**: testing scripts.
+- **frontend**: Contains HTML and CSS files for the front-end.
+- **requirements.txt**: Lists dependencies.
+- **README.md**: Main project documentation.
